@@ -25,8 +25,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "package-session": "cd src/json/session && zip -ur ../../../pandasuite-component.zip pandasuite.json && cp ../../../pandasuite-component.zip ../../../pandasuite-session-component.zip",
-    "package-auth": "cd src/json/auth && zip -ur ../../../pandasuite-component.zip pandasuite.json && cp ../../../pandasuite-component.zip ../../../pandasuite-auth-component.zip",
+    "package-session": "cd src/json/session && cp ../../../pandasuite-component.zip ../../../pandasuite-session-component.zip && zip -ur ../../../pandasuite-session-component.zip pandasuite.json",
+    "package-auth": "cd src/json/auth && cp ../../../pandasuite-component.zip ../../../pandasuite-auth-component.zip && zip -ur ../../../pandasuite-auth-component.zip pandasuite.json",
     "build-generic": "react-scripts build && cd build && zip -r -X '../pandasuite-component.zip' *",
     "build": "yarn clean && yarn build-generic && yarn package-auth && yarn package-session",
     "clean": "rm -rf build && rm -f pandasuite-component.zip && rm -f pandasuite-auth-component.zip && rm -f pandasuite-session-component.zip",
