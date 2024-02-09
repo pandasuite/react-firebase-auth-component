@@ -23,22 +23,24 @@ const Home = () => {
       firestore
         .collection('users')
         .doc(currentUser.uid)
-        .onSnapshot((snapshot) => {
-          const data = snapshot.data();
-          console.log(data);
+        .onSnapshot(
+          (snapshot) => {
+            const data = snapshot.data();
+            console.log(data);
 
-          PandaBridge.send(PandaBridge.UPDATED, {
-            queryable: { ...data, id: currentUser.uid },
-          });
+            PandaBridge.send(PandaBridge.UPDATED, {
+              queryable: { ...data, id: currentUser.uid },
+            });
 
-          if (signedInTrigger === false) {
-            PandaBridge.send('onSignedIn');
-            signedInTrigger = true;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+            if (signedInTrigger === false) {
+              PandaBridge.send('onSignedIn');
+              signedInTrigger = true;
+            }
+          },
+          (error) => {
+            console.log(error);
+          },
+        );
 
     return function cleanup() {
       if (unsubscribe) {
