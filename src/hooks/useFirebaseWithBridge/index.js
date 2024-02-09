@@ -4,15 +4,18 @@ import _ from 'lodash';
 import PandaBridge from 'pandasuite-bridge';
 import { usePandaBridge } from 'pandasuite-bridge-react';
 
-import app from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
+import app from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+// import { setLogLevel } from 'firebase/app';
 import { useMemo } from 'react';
 
 import JSONPointer from '@beingenious/jsonpointer';
 
 let firestore = null;
 let auth = null;
+
+// setLogLevel('debug');
 
 const getPointer = (schema, pointer) => {
   let resolvedPointer = [];
@@ -24,7 +27,10 @@ const getPointer = (schema, pointer) => {
       unitPool: {
         language: navigator.language.replace('-', '_'),
       },
-    }, undefined, undefined, resolvedPointer,
+    },
+    undefined,
+    undefined,
+    resolvedPointer,
   );
 
   if (!value) {
@@ -48,41 +54,49 @@ const getDocumentFromPointer = (userData, pointer, value) => {
   return update;
 };
 
-const changeData = ({
-  user, data, func, value,
-}) => {
+const changeData = ({ user, data, func, value }) => {
   const userDocRef = firestore.collection('users').doc(user.uid);
 
-  firestore.runTransaction((transaction) => transaction.get(userDocRef).then((userDoc) => {
-    if (userDoc.exists) {
-      const userData = userDoc.data();
-      const pointer = getPointer(userData, data);
+  firestore
+    .runTransaction((transaction) =>
+      transaction.get(userDocRef).then((userDoc) => {
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          const pointer = getPointer(userData, data);
 
-      let fieldValue = value;
+          let fieldValue = value;
 
-      if (func === 'inc') {
-        fieldValue = app.firestore.FieldValue.increment(parseInt(value));
-      } else if (func === 'dec') {
-        fieldValue = app.firestore.FieldValue.increment(-parseInt(value));
-      } else if (func === 'del') {
-        fieldValue = app.firestore.FieldValue.delete();
-      } else if (func === 'add') {
-        fieldValue = app.firestore.FieldValue.arrayUnion(value);
-      } else if (func === 'delbyid') {
-        const doc = _.find(_.get(userData, pointer.join('.')), (row) => row.id === value);
-        if (!doc) {
-          return;
+          if (func === 'inc') {
+            fieldValue = app.firestore.FieldValue.increment(parseInt(value));
+          } else if (func === 'dec') {
+            fieldValue = app.firestore.FieldValue.increment(-parseInt(value));
+          } else if (func === 'del') {
+            fieldValue = app.firestore.FieldValue.delete();
+          } else if (func === 'add') {
+            fieldValue = app.firestore.FieldValue.arrayUnion(value);
+          } else if (func === 'delbyid') {
+            const doc = _.find(
+              _.get(userData, pointer.join('.')),
+              (row) => row.id === value,
+            );
+            if (!doc) {
+              return;
+            }
+            fieldValue = app.firestore.FieldValue.arrayRemove(doc);
+          } else if (func === 'delbyvalue') {
+            fieldValue = app.firestore.FieldValue.arrayRemove(value);
+          }
+          transaction.update(
+            userDocRef,
+            getDocumentFromPointer(userData, pointer, fieldValue),
+          );
         }
-        fieldValue = app.firestore.FieldValue.arrayRemove(doc);
-      } else if (func === 'delbyvalue') {
-        fieldValue = app.firestore.FieldValue.arrayRemove(value);
-      }
-      transaction.update(userDocRef, getDocumentFromPointer(userData, pointer, fieldValue));
-    }
-  })).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.log(error);
-  });
+      }),
+    )
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    });
 };
 
 function useFirebaseWithBridge() {
@@ -98,14 +112,20 @@ function useFirebaseWithBridge() {
 
         if (currentUser) {
           changeData({
-            user: currentUser, data, func, value,
+            user: currentUser,
+            data,
+            func,
+            value,
           });
         } else {
           const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
               unsubscribe();
               changeData({
-                user, data, func, value,
+                user,
+                data,
+                func,
+                value,
               });
             }
           });
@@ -123,18 +143,25 @@ function useFirebaseWithBridge() {
       return [false];
     }
 
-    const mergeProperties = _.merge({}, properties, (properties.session || {}).properties);
+    const mergeProperties = _.merge(
+      {},
+      properties,
+      (properties.session || {}).properties,
+    );
 
     try {
-      const newApp = app.initializeApp({
-        apiKey: mergeProperties.apiKey,
-        authDomain: mergeProperties.authDomain,
-        databaseURL: mergeProperties.databaseURL,
-        projectId: mergeProperties.projectId,
-        storageBucket: mergeProperties.storageBucket,
-        messagingSenderId: mergeProperties.messagingSenderId,
-        appId: mergeProperties.appId,
-      }, _.uniqueId());
+      const newApp = app.initializeApp(
+        {
+          apiKey: mergeProperties.apiKey,
+          authDomain: mergeProperties.authDomain,
+          databaseURL: mergeProperties.databaseURL,
+          projectId: mergeProperties.projectId,
+          storageBucket: mergeProperties.storageBucket,
+          messagingSenderId: mergeProperties.messagingSenderId,
+          appId: mergeProperties.appId,
+        },
+        _.uniqueId(),
+      );
 
       newApp.firestore().enablePersistence({ synchronizeTabs: true });
 
