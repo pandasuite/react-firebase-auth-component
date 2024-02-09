@@ -5,36 +5,48 @@ import FirebaseBridgeContext from '../../FirebaseBridgeContext';
 
 const Home = () => {
   const firebaseWithBridge = useContext(FirebaseBridgeContext);
-  const { firestore, auth } = firebaseWithBridge || {};
+  const { firestore, auth, bridge } = firebaseWithBridge || {};
+  const { properties: { apiKey: isSession } = {} } = bridge || {};
 
   const currentUser = auth && auth.currentUser;
 
   useEffect(() => {
     let signedInTrigger = false;
 
-    const unsubscribe = currentUser && firestore
-      .collection('users')
-      .doc(currentUser.uid)
-      .onSnapshot((snapshot) => {
-        const data = snapshot.data();
+    if (!isSession) {
+      console.log('No session');
+      return null;
+    }
 
-        PandaBridge.send(PandaBridge.UPDATED, {
-          queryable: { ...data, id: currentUser.uid },
+    const unsubscribe =
+      currentUser &&
+      firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .onSnapshot((snapshot) => {
+          const data = snapshot.data();
+          console.log(data);
+
+          PandaBridge.send(PandaBridge.UPDATED, {
+            queryable: { ...data, id: currentUser.uid },
+          });
+
+          if (signedInTrigger === false) {
+            PandaBridge.send('onSignedIn');
+            signedInTrigger = true;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
         });
-
-        if (signedInTrigger === false) {
-          PandaBridge.send('onSignedIn');
-          signedInTrigger = true;
-        }
-      });
 
     return function cleanup() {
       if (unsubscribe) {
         unsubscribe();
       }
     };
-  }, [currentUser, firestore]);
-  return (<></>);
+  }, [currentUser, firestore, isSession]);
+  return <></>;
 };
 
 export default Home;
