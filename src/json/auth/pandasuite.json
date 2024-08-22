@@ -19,15 +19,6 @@
       "required": true
     },
     {
-      "id": "verifyEmail",
-      "name": "Force email verification",
-      "locale_name": {
-        "fr_FR": "Forcer la vérification d'email"
-      },
-      "type": "Boolean",
-      "value": false
-    },
-    {
       "id": "advancedFields",
       "name": "Advanced user fields",
       "locale_name": {
@@ -78,6 +69,13 @@
       "name": "Terms Clicked",
       "locale_name": {
         "fr_FR": "Conditions Cliquées"
+      }
+    },
+    {
+      "id": "onEmailVerified",
+      "name": "Email Verified",
+      "locale_name": {
+        "fr_FR": "Email Vérifié"
       }
     }
   ]

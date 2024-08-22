@@ -6,6 +6,7 @@ import { Header, Button, Card, Alert } from 'tabler-react';
 import * as ROUTES from '../../constants/routes';
 import StandaloneFormPage from '../StandaloneFormPage';
 import FirebaseBridgeContext from '../../FirebaseBridgeContext';
+import PandaBridge from 'pandasuite-bridge';
 
 const VerifyEmail = () => {
   const firebaseWithBridge = useContext(FirebaseBridgeContext);
@@ -30,6 +31,7 @@ const VerifyEmail = () => {
 
           setState((prev) => ({ ...prev, retryInProgress: false }));
           if (emailVerified) {
+            PandaBridge.send('onEmailVerified');
             history.push(ROUTES.HOME);
           }
         })

@@ -22,6 +22,15 @@
       "required": true
     },
     {
+      "id": "verifyEmail",
+      "name": "Force email verification",
+      "locale_name": {
+        "fr_FR": "Forcer la vérification d'email"
+      },
+      "type": "Boolean",
+      "value": false
+    },
+    {
       "id": "forceAuthenticationAfter",
       "name": "Force authentication after (hours)",
       "locale_name": {

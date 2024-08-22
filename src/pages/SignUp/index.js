@@ -238,7 +238,9 @@ const SignUp = () => {
                     href="#"
                     onClick={() => {
                       history.push(
-                        `${ROUTES.PASSWORD_FORGET}/${formik.values && formik.values.email}`,
+                        `${ROUTES.PASSWORD_FORGET}/${
+                          formik.values && formik.values.email
+                        }`,
                       );
                     }}
                   >
