@@ -36,10 +36,22 @@ function App() {
           <Switch>
             <Route exact path={ROUTES.SIGN_UP} component={SignUpPage} />
             <Route exact path={ROUTES.SIGN_IN} component={SignInPage} />
-            <Route exact path={`${ROUTES.PASSWORD_FORGET}/:email?`} component={PasswordForgetPage} />
-            <Route exact path={ROUTES.VERIFY_EMAIL} component={VerifyEmailPage} />
+            <Route
+              exact
+              path={`${ROUTES.PASSWORD_FORGET}/:email?`}
+              component={PasswordForgetPage}
+            />
+            <Route
+              exact
+              path={ROUTES.VERIFY_EMAIL}
+              component={VerifyEmailPage}
+            />
             <Route exact path={ROUTES.HOME} component={HomePage} />
-            <Route exact path={ROUTES.INVALID_CONFIGURATION} component={InvalidPage} />
+            <Route
+              exact
+              path={ROUTES.INVALID_CONFIGURATION}
+              component={InvalidPage}
+            />
           </Switch>
           <HandleStatePage />
         </Router>

@@ -21,8 +21,12 @@ const IntlProvider = (props) => {
   };
 
   return (
-    <NativeIntlProvider locale={locale} messages={localizedMessages[locale]} textComponent={<></>}>
-      { children }
+    <NativeIntlProvider
+      locale={locale}
+      messages={localizedMessages[locale]}
+      textComponent={<></>}
+    >
+      {children}
     </NativeIntlProvider>
   );
 };

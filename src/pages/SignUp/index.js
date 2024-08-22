@@ -2,9 +2,7 @@ import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
 
-import {
-  Form, Card, Button, Alert,
-} from 'tabler-react';
+import { Form, Card, Button, Alert } from 'tabler-react';
 
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -26,58 +24,72 @@ const SignUp = () => {
   const termsValidationSchema = {
     terms: Yup.bool()
       .required(intl.formatMessage({ id: 'form.required' }))
-      .oneOf([true], intl.formatMessage({ id: 'page.signup.form.input.terms.error' })),
+      .oneOf(
+        [true],
+        intl.formatMessage({ id: 'page.signup.form.input.terms.error' }),
+      ),
   };
 
   const formik = useFormik({
     initialValues: {},
-    validationSchema: Yup.object(_.merge({
-      name: Yup.string()
-        .required(intl.formatMessage({ id: 'form.required' })),
-      email: Yup.string()
-        .required(intl.formatMessage({ id: 'form.required' }))
-        .email(intl.formatMessage({ id: 'page.signup.form.input.email.error' })),
-      password: Yup.string()
-        .required(intl.formatMessage({ id: 'form.required' })),
-    }, properties && properties.terms ? termsValidationSchema : {})),
+    validationSchema: Yup.object(
+      _.merge(
+        {
+          name: Yup.string().required(
+            intl.formatMessage({ id: 'form.required' }),
+          ),
+          email: Yup.string()
+            .required(intl.formatMessage({ id: 'form.required' }))
+            .email(
+              intl.formatMessage({ id: 'page.signup.form.input.email.error' }),
+            ),
+          password: Yup.string().required(
+            intl.formatMessage({ id: 'form.required' }),
+          ),
+        },
+        properties && properties.terms ? termsValidationSchema : {},
+      ),
+    ),
     onSubmit: (values) => {
-      const {
-        name, email, password, position, company,
-      } = values;
+      const { name, email, password, position, company } = values;
 
-      auth.createUserWithEmailAndPassword(email, password).then(() => {
-        const { currentUser } = auth;
-        const fields = {
-          name,
-          email,
-        };
+      auth
+        .createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          const { currentUser } = auth;
+          const fields = {
+            name,
+            email,
+          };
 
-        if (properties.verifyEmail && !currentUser.emailVerified) {
-          currentUser.sendEmailVerification();
-        }
-
-        if (properties.advancedFields) {
-          if (position) {
-            fields.position = position;
+          if (properties.verifyEmail && !currentUser.emailVerified) {
+            currentUser.sendEmailVerification();
           }
-          if (company) {
-            fields.company = company;
-          }
-        }
 
-        firestore
-          .collection('users')
-          .doc(currentUser.uid)
-          .set(fields).then(() => {
-            formik.setSubmitting(false);
-          })
-          .catch(() => {
-            formik.setSubmitting(false);
-          });
-      }).catch((error) => {
-        formik.setErrors({ global: error });
-        formik.setSubmitting(false);
-      });
+          if (properties.advancedFields) {
+            if (position) {
+              fields.position = position;
+            }
+            if (company) {
+              fields.company = company;
+            }
+          }
+
+          firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .set(fields)
+            .then(() => {
+              formik.setSubmitting(false);
+            })
+            .catch(() => {
+              formik.setSubmitting(false);
+            });
+        })
+        .catch((error) => {
+          formik.setErrors({ global: error });
+          formik.setSubmitting(false);
+        });
     },
   });
 
@@ -85,14 +97,20 @@ const SignUp = () => {
     <StandaloneFormPage>
       <Form className="card" onSubmit={formik.handleSubmit}>
         <Card.Body className="p-6">
-          <Card.Title RootComponent="div">{intl.formatMessage({ id: 'page.signup.form.title' })}</Card.Title>
+          <Card.Title RootComponent="div">
+            {intl.formatMessage({ id: 'page.signup.form.title' })}
+          </Card.Title>
           <Form.Group
-            label={intl.formatMessage({ id: 'page.signup.form.input.name.label' })}
+            label={intl.formatMessage({
+              id: 'page.signup.form.input.name.label',
+            })}
             isRequired
           >
             <Form.Input
               name="name"
-              placeholder={intl.formatMessage({ id: 'page.signup.form.input.name.placeholder' })}
+              placeholder={intl.formatMessage({
+                id: 'page.signup.form.input.name.placeholder',
+              })}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values && formik.values.name}
@@ -102,12 +120,16 @@ const SignUp = () => {
             />
           </Form.Group>
           <Form.Group
-            label={intl.formatMessage({ id: 'page.signup.form.input.email.label' })}
+            label={intl.formatMessage({
+              id: 'page.signup.form.input.email.label',
+            })}
             isRequired
           >
             <Form.Input
               name="email"
-              placeholder={intl.formatMessage({ id: 'page.signup.form.input.email.placeholder' })}
+              placeholder={intl.formatMessage({
+                id: 'page.signup.form.input.email.placeholder',
+              })}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values && formik.values.email}
@@ -116,13 +138,17 @@ const SignUp = () => {
             />
           </Form.Group>
           <Form.Group
-            label={intl.formatMessage({ id: 'page.signup.form.input.password.label' })}
+            label={intl.formatMessage({
+              id: 'page.signup.form.input.password.label',
+            })}
             isRequired
           >
             <Form.Input
               name="password"
               type="password"
-              placeholder={intl.formatMessage({ id: 'page.signup.form.input.password.placeholder' })}
+              placeholder={intl.formatMessage({
+                id: 'page.signup.form.input.password.placeholder',
+              })}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values && formik.values.password}
@@ -130,14 +156,18 @@ const SignUp = () => {
               disabled={formik.isSubmitting}
             />
           </Form.Group>
-          {(properties && properties.advancedFields) && (
+          {properties && properties.advancedFields && (
             <>
               <Form.Group
-                label={intl.formatMessage({ id: 'page.signup.form.input.position.label' })}
+                label={intl.formatMessage({
+                  id: 'page.signup.form.input.position.label',
+                })}
               >
                 <Form.Input
                   name="position"
-                  placeholder={intl.formatMessage({ id: 'page.signup.form.input.position.placeholder' })}
+                  placeholder={intl.formatMessage({
+                    id: 'page.signup.form.input.position.placeholder',
+                  })}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values && formik.values.position}
@@ -147,11 +177,15 @@ const SignUp = () => {
                 />
               </Form.Group>
               <Form.Group
-                label={intl.formatMessage({ id: 'page.signup.form.input.company.label' })}
+                label={intl.formatMessage({
+                  id: 'page.signup.form.input.company.label',
+                })}
               >
                 <Form.Input
                   name="company"
-                  placeholder={intl.formatMessage({ id: 'page.signup.form.input.company.placeholder' })}
+                  placeholder={intl.formatMessage({
+                    id: 'page.signup.form.input.company.placeholder',
+                  })}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values && formik.values.company}
@@ -162,7 +196,7 @@ const SignUp = () => {
               </Form.Group>
             </>
           )}
-          {(properties && properties.terms) && (
+          {properties && properties.terms && (
             <>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label className="custom-control custom-checkbox">
@@ -177,25 +211,44 @@ const SignUp = () => {
                   isRequired
                 />
                 <span className="custom-control-label">
-                  <Button className="p-0 m-0" link href="#" onClick={() => { PandaBridge.send('onTermsClicked'); return false; }}>
+                  <Button
+                    className="p-0 m-0"
+                    link
+                    href="#"
+                    onClick={() => {
+                      PandaBridge.send('onTermsClicked');
+                      return false;
+                    }}
+                  >
                     {intl.formatMessage({ id: 'page.signup.form.terms' })}
                   </Button>
                 </span>
               </label>
             </>
           )}
-          {(formik.errors && formik.errors.global) && (
-          <Alert type="danger" className="mt-6" isDismissible>
-            {formik.errors.global.message}
-            {formik.errors.global.code === 'auth/wrong-password' && (
-              <>
-                <br />
-                <Button link className="p-0" href="#" onClick={() => { history.push(`${ROUTES.PASSWORD_FORGET}/${formik.values && formik.values.email}`); }}>
-                  {intl.formatMessage({ id: 'page.signup.form.forgot.label' })}
-                </Button>
-              </>
-            )}
-          </Alert>
+          {formik.errors && formik.errors.global && (
+            <Alert type="danger" className="mt-6" isDismissible>
+              {formik.errors.global.message}
+              {formik.errors.global.code === 'auth/wrong-password' && (
+                <>
+                  <br />
+                  <Button
+                    link
+                    className="p-0"
+                    href="#"
+                    onClick={() => {
+                      history.push(
+                        `${ROUTES.PASSWORD_FORGET}/${formik.values && formik.values.email}`,
+                      );
+                    }}
+                  >
+                    {intl.formatMessage({
+                      id: 'page.signup.form.forgot.label',
+                    })}
+                  </Button>
+                </>
+              )}
+            </Alert>
           )}
           <Form.Footer>
             <Button
@@ -203,9 +256,9 @@ const SignUp = () => {
               color="primary"
               loading={formik.isSubmitting}
               disabled={
-                formik.isSubmitting
-                || _.isEmpty(formik.values)
-                || !_.isEmpty(formik.errors)
+                formik.isSubmitting ||
+                _.isEmpty(formik.values) ||
+                !_.isEmpty(formik.errors)
               }
               block
             >
@@ -216,7 +269,14 @@ const SignUp = () => {
             <div className="col col-auto">
               {intl.formatMessage({ id: 'page.signup.form.signin.label' })}
             </div>
-            <Button link className="p-0" href="#" onClick={() => { history.push(ROUTES.SIGN_IN); }}>
+            <Button
+              link
+              className="p-0"
+              href="#"
+              onClick={() => {
+                history.push(ROUTES.SIGN_IN);
+              }}
+            >
               {intl.formatMessage({ id: 'page.signup.form.signin.action' })}
             </Button>
           </div>

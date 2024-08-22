@@ -1,6 +1,6 @@
 {
   "form.required": "Required",
-  
+
   "page.invalid.message": "You need to provide valid Firebase credentials (apiKey, projectId).",
   "page.invalid.link.name": "Learn more",
   "page.invalid.link.value": "https://learn.pandasuite.com/hc/en-us/articles/360013987000-Add-User-Authentication-by-Firebase",

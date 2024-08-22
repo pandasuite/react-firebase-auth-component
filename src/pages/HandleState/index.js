@@ -18,7 +18,7 @@ function HandleStatePage() {
     const { auth, bridge } = firebaseWithBridge;
 
     if (auth === false) {
-      return (<Redirect to={ROUTES.INVALID_CONFIGURATION} />);
+      return <Redirect to={ROUTES.INVALID_CONFIGURATION} />;
     }
 
     const safePush = (path) => {
@@ -37,16 +37,18 @@ function HandleStatePage() {
         }
         if (properties.forceAuthenticationAfter > 0) {
           const { metadata } = user;
-          const hoursSinceTheLastSignIn = (
-            Date.now() - Date.parse(metadata.lastSignInTime)
-          ) / 1000 / 60 / 60;
+          const hoursSinceTheLastSignIn =
+            (Date.now() - Date.parse(metadata.lastSignInTime)) / 1000 / 60 / 60;
 
           if (hoursSinceTheLastSignIn > properties.forceAuthenticationAfter) {
-            user.reload().then(() => {
-              safePush(ROUTES.HOME);
-            }).catch(() => {
-              auth.signOut();
-            });
+            user
+              .reload()
+              .then(() => {
+                safePush(ROUTES.HOME);
+              })
+              .catch(() => {
+                auth.signOut();
+              });
             return null;
           }
         }
@@ -56,9 +58,11 @@ function HandleStatePage() {
           queryable: {},
         });
         PandaBridge.send('onSignedOut');
-        if (history.location.pathname !== ROUTES.SIGN_IN
-          && history.location.pathname !== ROUTES.SIGN_UP
-          && !history.location.pathname.startsWith(ROUTES.PASSWORD_FORGET)) {
+        if (
+          history.location.pathname !== ROUTES.SIGN_IN &&
+          history.location.pathname !== ROUTES.SIGN_UP &&
+          !history.location.pathname.startsWith(ROUTES.PASSWORD_FORGET)
+        ) {
           safePush(ROUTES.SIGN_IN);
         }
       }

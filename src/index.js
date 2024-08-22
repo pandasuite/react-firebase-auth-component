@@ -7,4 +7,9 @@ import { PandaBridgeRoot } from 'pandasuite-bridge-react';
 import './index.css';
 import App from './App';
 
-ReactDOM.render(<PandaBridgeRoot><App /></PandaBridgeRoot>, document.getElementById('root'));
+ReactDOM.render(
+  <PandaBridgeRoot>
+    <App />
+  </PandaBridgeRoot>,
+  document.getElementById('root'),
+);

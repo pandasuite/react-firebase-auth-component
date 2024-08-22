@@ -9,9 +9,7 @@ const StandaloneFormPage = (props) => {
       <div className="page-single">
         <div className="container">
           <div className="row">
-            <div className="col mx-auto">
-              {children}
-            </div>
+            <div className="col mx-auto">{children}</div>
           </div>
         </div>
       </div>

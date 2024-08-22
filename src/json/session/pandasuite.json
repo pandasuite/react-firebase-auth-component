@@ -87,49 +87,49 @@
               "name": "Set",
               "locale_name": {
                 "fr_FR": "Définir"
-              }    
+              }
             },
             {
               "id": "inc",
               "name": "Increment",
               "locale_name": {
                 "fr_FR": "Incrémenter"
-              }    
+              }
             },
             {
               "id": "dec",
               "name": "Decrement",
               "locale_name": {
                 "fr_FR": "Décrémenter"
-              }    
+              }
             },
             {
               "id": "add",
               "name": "Add",
               "locale_name": {
                 "fr_FR": "Ajouter"
-              }    
+              }
             },
             {
               "id": "del",
               "name": "Delete",
               "locale_name": {
                 "fr_FR": "Supprimer"
-              }    
+              }
             },
             {
               "id": "delbyid",
               "name": "Delete by id",
               "locale_name": {
                 "fr_FR": "Supprimer par id"
-              }    
+              }
             },
             {
               "id": "delbyvalue",
               "name": "Delete by value",
               "locale_name": {
                 "fr_FR": "Supprimer par valeur"
-              }    
+              }
             }
           ]
         },
@@ -163,4 +163,3 @@
     }
   }
 }
-
