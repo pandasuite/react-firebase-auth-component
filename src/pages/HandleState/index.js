@@ -30,8 +30,11 @@ function HandleStatePage() {
     auth.onAuthStateChanged((user) => {
       if (user) {
         const { properties } = bridge || {};
+        const requiresEmailVerification =
+          properties.verifyEmail === true ||
+          properties.session?.properties?.verifyEmail === true;
 
-        if (properties.verifyEmail && !user.emailVerified) {
+        if (requiresEmailVerification && !user.emailVerified) {
           safePush(ROUTES.VERIFY_EMAIL);
           return null;
         }

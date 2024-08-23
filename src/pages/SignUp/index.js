@@ -61,8 +61,11 @@ const SignUp = () => {
             name,
             email,
           };
+          const requiresEmailVerification =
+            properties.verifyEmail === true ||
+            properties.session?.properties?.verifyEmail === true;
 
-          if (properties.verifyEmail && !currentUser.emailVerified) {
+          if (requiresEmailVerification && !currentUser.emailVerified) {
             currentUser.sendEmailVerification();
           }
 
