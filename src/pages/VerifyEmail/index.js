@@ -1,12 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
 import { Header, Button, Card, Alert } from 'tabler-react';
+import PandaBridge from 'pandasuite-bridge';
 
 import * as ROUTES from '../../constants/routes';
 import StandaloneFormPage from '../StandaloneFormPage';
 import FirebaseBridgeContext from '../../FirebaseBridgeContext';
-import PandaBridge from 'pandasuite-bridge';
 
 const VerifyEmail = () => {
   const firebaseWithBridge = useContext(FirebaseBridgeContext);
@@ -18,8 +18,38 @@ const VerifyEmail = () => {
     error: false,
   });
 
-  const { auth } = firebaseWithBridge || {};
+  const { auth, firestore } = firebaseWithBridge || {};
   const { currentUser } = auth || {};
+
+  useEffect(() => {
+    if (!currentUser) {
+      return undefined;
+    }
+
+    const unsubscribe =
+      currentUser &&
+      firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .onSnapshot(
+          (snapshot) => {
+            const data = snapshot.data();
+
+            PandaBridge.send(PandaBridge.UPDATED, {
+              queryable: { ...data, id: currentUser.uid },
+            });
+          },
+          (error) => {
+            console.log(error);
+          },
+        );
+
+    return function cleanup() {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [currentUser, firestore]);
 
   const onRetryClick = () => {
     setState((prev) => ({ ...prev, error: false, retryInProgress: true }));
