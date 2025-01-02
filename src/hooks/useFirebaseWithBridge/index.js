@@ -109,12 +109,26 @@ function useFirebaseWithBridge() {
       },
       signInWithCustomToken: ({ token }) => {
         if (auth && token) {
-          auth.signInWithCustomToken(token);
+          auth.signInWithCustomToken(token).catch((error) => {
+            PandaBridge.send('onSignInError', [
+              {
+                code: error.code,
+                message: error.message,
+              },
+            ]);
+          });
         }
       },
       signInWithEmailAndPassword: ({ email, password }) => {
         if (auth && email && password) {
-          auth.signInWithEmailAndPassword(email, password);
+          auth.signInWithEmailAndPassword(email, password).catch((error) => {
+            PandaBridge.send('onSignInError', [
+              {
+                code: error.code,
+                message: error.message,
+              },
+            ]);
+          });
         }
       },
       change: ({ data, function: func, value }) => {

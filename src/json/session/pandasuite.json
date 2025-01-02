@@ -55,6 +55,29 @@
       "locale_name": {
         "fr_FR": "Utilisateur Déconnecté"
       }
+    },
+    {
+      "id": "onSignInError",
+      "name": "Sign In Error",
+      "locale_name": {
+        "fr_FR": "Erreur de connexion"
+      },
+      "queryable": {
+        "code": "auth/invalid-custom-token",
+        "__desc_code": {
+          "name": "Code",
+          "locale_name": {
+            "fr_FR": "Code"
+          }
+        },
+        "message": "Firebase: Invalid assertion format. (auth/invalid-custom-token).",
+        "__desc_message": {
+          "name": "Message",
+          "locale_name": {
+            "fr_FR": "Message"
+          }
+        }
+      }
     }
   ],
 
@@ -80,7 +103,7 @@
             "fr_FR": "Jeton"
           },
           "type": "String",
-          "value": ""
+          "bindable": true
         }
       ]
     },
@@ -98,7 +121,7 @@
             "fr_FR": "Email"
           },
           "type": "String",
-          "value": ""
+          "bindable": true
         },
         {
           "id": "password",
@@ -107,7 +130,7 @@
             "fr_FR": "Mot de passe"
           },
           "type": "String",
-          "value": ""
+          "bindable": true
         }
       ]
     },
