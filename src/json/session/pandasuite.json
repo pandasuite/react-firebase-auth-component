@@ -67,6 +67,51 @@
       }
     },
     {
+      "id": "signInWithCustomToken",
+      "name": "Sign In with Custom Token",
+      "locale_name": {
+        "fr_FR": "Se connecter avec un jeton personnalisé"
+      },
+      "params": [
+        {
+          "id": "token",
+          "name": "Token",
+          "locale_name": {
+            "fr_FR": "Jeton"
+          },
+          "type": "String",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "id": "signInWithEmailAndPassword",
+      "name": "Sign In with Email and Password",
+      "locale_name": {
+        "fr_FR": "Se connecter avec email et mot de passe"
+      },
+      "params": [
+        {
+          "id": "email",
+          "name": "Email",
+          "locale_name": {
+            "fr_FR": "Email"
+          },
+          "type": "String",
+          "value": ""
+        },
+        {
+          "id": "password",
+          "name": "Password",
+          "locale_name": {
+            "fr_FR": "Mot de passe"
+          },
+          "type": "String",
+          "value": ""
+        }
+      ]
+    },
+    {
       "id": "change",
       "name": "Modify the data",
       "locale_name": {

@@ -107,6 +107,16 @@ function useFirebaseWithBridge() {
           auth.signOut();
         }
       },
+      signInWithCustomToken: ({ token }) => {
+        if (auth && token) {
+          auth.signInWithCustomToken(token);
+        }
+      },
+      signInWithEmailAndPassword: ({ email, password }) => {
+        if (auth && email && password) {
+          auth.signInWithEmailAndPassword(email, password);
+        }
+      },
       change: ({ data, function: func, value }) => {
         const { currentUser } = auth;
 
