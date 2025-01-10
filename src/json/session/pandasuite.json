@@ -78,62 +78,33 @@
           }
         }
       }
+    },
+    {
+      "id": "onRegisterError",
+      "name": "Register Error",
+      "locale_name": {
+        "fr_FR": "Erreur d'inscription"
+      },
+      "queryable": {
+        "code": "auth/invalid-email",
+        "__desc_code": {
+          "name": "Code",
+          "locale_name": {
+            "fr_FR": "Code"
+          }
+        },
+        "message": "Firebase: The email address is badly formatted. (auth/invalid-email).",
+        "__desc_message": {
+          "name": "Message",
+          "locale_name": {
+            "fr_FR": "Message"
+          }
+        }
+      }
     }
   ],
 
   "actions": [
-    {
-      "id": "signOut",
-      "name": "Sign Out",
-      "locale_name": {
-        "fr_FR": "Se déconnecter"
-      }
-    },
-    {
-      "id": "signInWithCustomToken",
-      "name": "Sign In with Custom Token",
-      "locale_name": {
-        "fr_FR": "Se connecter avec un jeton personnalisé"
-      },
-      "params": [
-        {
-          "id": "token",
-          "name": "Token",
-          "locale_name": {
-            "fr_FR": "Jeton"
-          },
-          "type": "String",
-          "bindable": true
-        }
-      ]
-    },
-    {
-      "id": "signInWithEmailAndPassword",
-      "name": "Sign In with Email and Password",
-      "locale_name": {
-        "fr_FR": "Se connecter avec email et mot de passe"
-      },
-      "params": [
-        {
-          "id": "email",
-          "name": "Email",
-          "locale_name": {
-            "fr_FR": "Email"
-          },
-          "type": "String",
-          "bindable": true
-        },
-        {
-          "id": "password",
-          "name": "Password",
-          "locale_name": {
-            "fr_FR": "Mot de passe"
-          },
-          "type": "String",
-          "bindable": true
-        }
-      ]
-    },
     {
       "id": "change",
       "name": "Modify the data",
@@ -217,6 +188,94 @@
             "fr_FR": "Valeur"
           },
           "type": "JSON",
+          "bindable": true
+        }
+      ]
+    },
+    {
+      "id": "signInWithCustomToken",
+      "name": "Sign In with Custom Token",
+      "locale_name": {
+        "fr_FR": "Se connecter avec un jeton personnalisé"
+      },
+      "params": [
+        {
+          "id": "token",
+          "name": "Token",
+          "locale_name": {
+            "fr_FR": "Jeton"
+          },
+          "type": "String",
+          "bindable": true
+        }
+      ]
+    },
+    {
+      "id": "signInWithEmailAndPassword",
+      "name": "Sign In with Email and Password",
+      "locale_name": {
+        "fr_FR": "Se connecter avec email et mot de passe"
+      },
+      "params": [
+        {
+          "id": "email",
+          "name": "Email",
+          "locale_name": {
+            "fr_FR": "Email"
+          },
+          "type": "String",
+          "bindable": true
+        },
+        {
+          "id": "password",
+          "name": "Password",
+          "locale_name": {
+            "fr_FR": "Mot de passe"
+          },
+          "type": "String",
+          "bindable": true
+        }
+      ]
+    },
+    {
+      "id": "signOut",
+      "name": "Sign Out",
+      "locale_name": {
+        "fr_FR": "Se déconnecter"
+      }
+    },
+    {
+      "id": "registerWithEmailAndPassword",
+      "name": "Register with Email and Password",
+      "locale_name": {
+        "fr_FR": "S'inscrire avec email et mot de passe"
+      },
+      "params": [
+        {
+          "id": "email",
+          "name": "Email",
+          "locale_name": {
+            "fr_FR": "Email"
+          },
+          "type": "String",
+          "bindable": true
+        },
+        {
+          "id": "password",
+          "name": "Password",
+          "locale_name": {
+            "fr_FR": "Mot de passe"
+          },
+          "type": "String",
+          "bindable": true
+        },
+        {
+          "id": "traits",
+          "name": "Traits",
+          "locale_name": {
+            "fr_FR": "Caractéristiques"
+          },
+          "type": "Hash",
           "bindable": true
         }
       ]

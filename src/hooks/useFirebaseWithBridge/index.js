@@ -155,6 +155,28 @@ function useFirebaseWithBridge() {
           });
         }
       },
+      registerWithEmailAndPassword: ({ email, password, traits }) => {
+        if (auth && email && password) {
+          auth
+            .createUserWithEmailAndPassword(email, password)
+            .then((cred) => {
+              if (firestore) {
+                firestore
+                  .collection('users')
+                  .doc(cred.user.uid)
+                  .set({ email, ...traits }, { merge: true });
+              }
+            })
+            .catch((error) => {
+              PandaBridge.send('onRegisterError', [
+                {
+                  code: error.code,
+                  message: error.message,
+                },
+              ]);
+            });
+        }
+      },
     },
   });
 
