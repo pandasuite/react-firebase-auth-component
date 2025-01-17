@@ -1,24 +1,24 @@
-import React, { useContext, useMemo } from 'react';
-import { useHistory, Redirect } from 'react-router-dom';
+import { useContext, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import PandaBridge from 'pandasuite-bridge';
 
 import * as ROUTES from '../../constants/routes';
-
 import FirebaseBridgeContext from '../../FirebaseBridgeContext';
 
 function HandleStatePage() {
   const history = useHistory();
   const firebaseWithBridge = useContext(FirebaseBridgeContext);
 
-  return useMemo(() => {
+  useEffect(() => {
     if (firebaseWithBridge === null) {
-      return null;
+      return;
     }
 
     const { auth, bridge } = firebaseWithBridge;
 
     if (auth === false) {
-      return <Redirect to={ROUTES.INVALID_CONFIGURATION} />;
+      history.replace(ROUTES.INVALID_CONFIGURATION);
+      return;
     }
 
     const safePush = (path) => {
@@ -27,7 +27,7 @@ function HandleStatePage() {
       }
     };
 
-    auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         const { properties } = bridge || {};
         const requiresEmailVerification =
@@ -36,8 +36,9 @@ function HandleStatePage() {
 
         if (requiresEmailVerification && !user.emailVerified) {
           safePush(ROUTES.VERIFY_EMAIL);
-          return null;
+          return;
         }
+
         if (properties.forceAuthenticationAfter > 0) {
           const { metadata } = user;
           const hoursSinceTheLastSignIn =
@@ -52,7 +53,7 @@ function HandleStatePage() {
               .catch(() => {
                 auth.signOut();
               });
-            return null;
+            return;
           }
         }
         safePush(ROUTES.HOME);
@@ -69,11 +70,12 @@ function HandleStatePage() {
           safePush(ROUTES.SIGN_IN);
         }
       }
-      return null;
     });
 
-    return null;
+    return () => unsubscribe();
   }, [firebaseWithBridge, history]);
+
+  return null;
 }
 
 export default HandleStatePage;

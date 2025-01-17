@@ -11,6 +11,7 @@ import 'firebase/compat/firestore';
 import { useMemo } from 'react';
 
 import JSONPointer from '@beingenious/jsonpointer';
+import { initializeFirebase } from './firebaseConfig';
 
 let firestore = null;
 let auth = null;
@@ -196,22 +197,17 @@ function useFirebaseWithBridge() {
     );
 
     try {
-      const newApp = app.initializeApp(
-        {
-          apiKey: mergeProperties.apiKey,
-          authDomain: mergeProperties.authDomain,
-          databaseURL: mergeProperties.databaseURL,
-          projectId: mergeProperties.projectId,
-          storageBucket: mergeProperties.storageBucket,
-          messagingSenderId: mergeProperties.messagingSenderId,
-          appId: mergeProperties.appId,
-        },
-        _.uniqueId(),
-      );
+      const initializedApp = initializeFirebase({
+        apiKey: mergeProperties.apiKey,
+        authDomain: mergeProperties.authDomain,
+        databaseURL: mergeProperties.databaseURL,
+        projectId: mergeProperties.projectId,
+        storageBucket: mergeProperties.storageBucket,
+        messagingSenderId: mergeProperties.messagingSenderId,
+        appId: mergeProperties.appId,
+      });
 
-      newApp.firestore().enablePersistence({ synchronizeTabs: true });
-
-      return [newApp.auth(), newApp.firestore()];
+      return [initializedApp.auth, initializedApp.firestore];
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log(error);
