@@ -13,6 +13,10 @@ async function fixIndexDbBug() {
   const databases = await window.indexedDB.databases();
   const firestoreDb = find(databases, (db) => db.name.startsWith('firestore/'));
 
+  if (!firestoreDb) {
+    return;
+  }
+
   const timeOut = setTimeout(async () => {
     console.log('IndexedDB Safari Bug...', firestoreDb.name);
     await deleteDB(firestoreDb.name);
