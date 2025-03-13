@@ -132,6 +132,40 @@ function useFirebaseWithBridge() {
           });
         }
       },
+      generateAuthToken: ({ forceRefresh }) => {
+        const { currentUser } = auth;
+
+        if (auth && currentUser) {
+          currentUser
+            .getIdToken(forceRefresh)
+            .then((token) => {
+              // Decode the token to get the expiration time
+              const tokenParts = token.split('.');
+              if (tokenParts.length === 3) {
+                try {
+                  const payload = JSON.parse(atob(tokenParts[1]));
+                  const expiresAt = {
+                    type: 'Date',
+                    value: payload.exp,
+                  };
+
+                  // Trigger the event with the token and expiration
+                  PandaBridge.send('onAuthTokenGenerated', [
+                    {
+                      token,
+                      expiresAt,
+                    },
+                  ]);
+                } catch (error) {
+                  console.error('Error decoding token:', error);
+                }
+              }
+            })
+            .catch((error) => {
+              console.error('Error generating auth token:', error);
+            });
+        }
+      },
       change: ({ data, function: func, value }) => {
         const { currentUser } = auth;
 

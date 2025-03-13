@@ -101,6 +101,32 @@
           }
         }
       }
+    },
+    {
+      "id": "onAuthTokenGenerated",
+      "name": "Auth Token Generated",
+      "locale_name": {
+        "fr_FR": "Token d'authentification généré"
+      },
+      "queryable": {
+        "token": "",
+        "__desc_token": {
+          "name": "Token",
+          "locale_name": {
+            "fr_FR": "Jeton"
+          }
+        },
+        "expiresAt": {
+          "type": "Date",
+          "value": 0
+        },
+        "__desc_expiresAt": {
+          "name": "Expires At",
+          "locale_name": {
+            "fr_FR": "Expire le"
+          }
+        }
+      }
     }
   ],
 
@@ -276,6 +302,25 @@
             "fr_FR": "Caractéristiques"
           },
           "type": "Hash",
+          "bindable": true
+        }
+      ]
+    },
+    {
+      "id": "generateAuthToken",
+      "name": "Generate Auth Token",
+      "locale_name": {
+        "fr_FR": "Générer un jeton d'authentification"
+      },
+      "params": [
+        {
+          "id": "forceRefresh",
+          "name": "Force Refresh",
+          "locale_name": {
+            "fr_FR": "Forcer le rafraîchissement"
+          },
+          "type": "Boolean",
+          "value": true,
           "bindable": true
         }
       ]
