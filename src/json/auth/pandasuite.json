@@ -28,6 +28,43 @@
       "value": false
     },
     {
+      "id": "fields",
+      "name": "Fields",
+      "locale_name": {
+        "fr_FR": "Champs"
+      },
+      "type": "JSON",
+      "value": [
+        {
+          "id": "position",
+          "label": "Position",
+          "locale_label": {
+            "fr_FR": "Fonction"
+          },
+          "placeholder": "Enter Position",
+          "locale_placeholder": {
+            "fr_FR": "Fonction"
+          },
+          "fieldType": "text",
+          "required": true
+        },
+        {
+          "id": "company",
+          "label": "Company",
+          "locale_label": {
+            "fr_FR": "Société"
+          },
+          "placeholder": "Enter Company",
+          "locale_placeholder": {
+            "fr_FR": "Société"
+          },
+          "fieldType": "text",
+          "required": false
+        }
+      ],
+      "hidden": "properties.advancedFields.value != true"
+    },
+    {
       "id": "terms",
       "name": "Communications and usage terms",
       "locale_name": {

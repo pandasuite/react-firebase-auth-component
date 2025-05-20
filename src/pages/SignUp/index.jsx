@@ -20,7 +20,7 @@ const SignUp = () => {
 
   const { auth, firestore, bridge } = firebaseWithBridge || {};
   const { properties } = bridge || {};
-
+  const { [PandaBridge.LANGUAGE]: language } = properties || {};
   const termsValidationSchema = {
     terms: Yup.bool()
       .required(intl.formatMessage({ id: 'form.required' }))
@@ -30,8 +30,46 @@ const SignUp = () => {
       ),
   };
 
+  // Build dynamic validation schema for custom fields
+  const buildDynamicValidationSchema = () => {
+    const customFieldsSchema = {};
+
+    if (properties && properties.fields && Array.isArray(properties.fields)) {
+      properties.fields.forEach((field) => {
+        if (field.required) {
+          if (field.fieldType === 'checkbox') {
+            customFieldsSchema[field.id] = Yup.bool();
+          } else {
+            customFieldsSchema[field.id] = Yup.string().required(
+              intl.formatMessage({ id: 'form.required' }),
+            );
+          }
+        }
+      });
+    }
+
+    return customFieldsSchema;
+  };
+
+  // Build initial values including dynamic fields
+  const buildInitialValues = () => {
+    const initialValues = {};
+
+    if (properties && properties.fields && Array.isArray(properties.fields)) {
+      properties.fields.forEach((field) => {
+        if (field.fieldType === 'checkbox' && field.value !== undefined) {
+          initialValues[field.id] = field.value;
+        } else {
+          initialValues[field.id] = '';
+        }
+      });
+    }
+
+    return initialValues;
+  };
+
   const formik = useFormik({
-    initialValues: {},
+    initialValues: buildInitialValues(),
     validationSchema: Yup.object(
       _.merge(
         {
@@ -48,10 +86,23 @@ const SignUp = () => {
           ),
         },
         properties && properties.terms ? termsValidationSchema : {},
+        properties && properties.advancedFields
+          ? buildDynamicValidationSchema()
+          : {},
       ),
     ),
     onSubmit: (values) => {
-      const { name, email, password, position, company } = values;
+      const { name, email, password } = values;
+      const customFields = {};
+
+      // Extract custom fields from values
+      if (properties && properties.fields && Array.isArray(properties.fields)) {
+        properties.fields.forEach((field) => {
+          if (values[field.id] !== undefined) {
+            customFields[field.id] = values[field.id];
+          }
+        });
+      }
 
       auth
         .createUserWithEmailAndPassword(email, password)
@@ -60,22 +111,16 @@ const SignUp = () => {
           const fields = {
             name,
             email,
+            ...customFields,
           };
           const requiresEmailVerification =
             properties.verifyEmail === true ||
-            properties.session?.properties?.verifyEmail === true;
+            (properties.session &&
+              properties.session.properties &&
+              properties.session.properties.verifyEmail === true);
 
           if (requiresEmailVerification && !currentUser.emailVerified) {
             currentUser.sendEmailVerification();
-          }
-
-          if (properties.advancedFields) {
-            if (position) {
-              fields.position = position;
-            }
-            if (company) {
-              fields.company = company;
-            }
           }
 
           firestore
@@ -95,6 +140,82 @@ const SignUp = () => {
         });
     },
   });
+
+  // Render a form field based on its type
+  const renderField = (field, index) => {
+    const locale = language;
+
+    // Get localized label or fallback to default
+    const fieldLabel =
+      field.locale_label && field.locale_label[locale]
+        ? field.locale_label[locale]
+        : field.label;
+
+    // Get localized placeholder or fallback to default
+    const fieldPlaceholder =
+      field.locale_placeholder && field.locale_placeholder[locale]
+        ? field.locale_placeholder[locale]
+        : field.placeholder;
+
+    switch (field.fieldType) {
+      case 'textarea':
+        return (
+          <Form.Group
+            key={`custom-field-${index}`}
+            label={fieldLabel}
+            isRequired={field.required}
+          >
+            <Form.Textarea
+              name={field.id}
+              placeholder={fieldPlaceholder}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values && formik.values[field.id]}
+              error={formik.errors && formik.errors[field.id]}
+              disabled={formik.isSubmitting}
+              isRequired={field.required}
+            />
+          </Form.Group>
+        );
+      case 'checkbox':
+        return (
+          <Form.Group key={`custom-field-${index}`}>
+            <label className="custom-control custom-checkbox">
+              <Form.Input
+                type="checkbox"
+                name={field.id}
+                checked={formik.values && formik.values[field.id]}
+                error={formik.errors && formik.errors[field.id]}
+                disabled={formik.isSubmitting}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                isRequired={field.required}
+              />
+              <span className="custom-control-label">{fieldLabel}</span>
+            </label>
+          </Form.Group>
+        );
+      default: // 'text' or any other type defaults to text input
+        return (
+          <Form.Group
+            key={`custom-field-${index}`}
+            label={fieldLabel}
+            isRequired={field.required}
+          >
+            <Form.Input
+              name={field.id}
+              placeholder={fieldPlaceholder}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values && formik.values[field.id]}
+              error={formik.errors && formik.errors[field.id]}
+              disabled={formik.isSubmitting}
+              isRequired={field.required}
+            />
+          </Form.Group>
+        );
+    }
+  };
 
   return (
     <StandaloneFormPage>
@@ -159,49 +280,18 @@ const SignUp = () => {
               disabled={formik.isSubmitting}
             />
           </Form.Group>
-          {properties && properties.advancedFields && (
-            <>
-              <Form.Group
-                label={intl.formatMessage({
-                  id: 'page.signup.form.input.position.label',
-                })}
-              >
-                <Form.Input
-                  name="position"
-                  placeholder={intl.formatMessage({
-                    id: 'page.signup.form.input.position.placeholder',
-                  })}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values && formik.values.position}
-                  error={formik.errors && formik.errors.position}
-                  disabled={formik.isSubmitting}
-                  isRequired
-                />
-              </Form.Group>
-              <Form.Group
-                label={intl.formatMessage({
-                  id: 'page.signup.form.input.company.label',
-                })}
-              >
-                <Form.Input
-                  name="company"
-                  placeholder={intl.formatMessage({
-                    id: 'page.signup.form.input.company.placeholder',
-                  })}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values && formik.values.company}
-                  error={formik.errors && formik.errors.company}
-                  disabled={formik.isSubmitting}
-                  isRequired
-                />
-              </Form.Group>
-            </>
-          )}
+          {properties &&
+            properties.advancedFields &&
+            properties.fields &&
+            Array.isArray(properties.fields) && (
+              <>
+                {properties.fields.map((field, index) =>
+                  renderField(field, index),
+                )}
+              </>
+            )}
           {properties && properties.terms && (
             <>
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label className="custom-control custom-checkbox">
                 <Form.Input
                   type="checkbox"

@@ -22,6 +22,8 @@
     "implicit-arrow-linebreak": "off",
     "no-console": "off",
     "object-curly-newline": "off",
-    "function-paren-newline": "off"
+    "function-paren-newline": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "indent": "off"
   }
 }
