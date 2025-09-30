@@ -97,6 +97,12 @@ const changeData = ({ user, data, func, value }) => {
     .catch((error) => {
       // eslint-disable-next-line no-console
       console.log(error);
+      PandaBridge.send('onChangeError', [
+        {
+          code: (error && error.code) || 'unknown',
+          message: (error && error.message) || String(error),
+        },
+      ]);
     });
 };
 
