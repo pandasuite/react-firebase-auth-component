@@ -127,6 +127,29 @@
           }
         }
       }
+    },
+    {
+      "id": "onChangeError",
+      "name": "Modify Data Error",
+      "locale_name": {
+        "fr_FR": "Erreur de modification de données"
+      },
+      "queryable": {
+        "code": "",
+        "__desc_code": {
+          "name": "Code",
+          "locale_name": {
+            "fr_FR": "Code"
+          }
+        },
+        "message": "",
+        "__desc_message": {
+          "name": "Message",
+          "locale_name": {
+            "fr_FR": "Message"
+          }
+        }
+      }
     }
   ],
 
