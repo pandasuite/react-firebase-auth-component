@@ -50,8 +50,22 @@ function HandleStatePage() {
               .then(() => {
                 safePush(ROUTES.HOME);
               })
-              .catch(() => {
-                auth.signOut();
+              .catch((e) => {
+                if (e && e.code === 'auth/network-request-failed') {
+                  const once = () => {
+                    window.removeEventListener('online', once);
+                    user
+                      .reload()
+                      .then(() => safePush(ROUTES.HOME))
+                      .catch(() => {});
+                  };
+                  window.addEventListener('online', once, {
+                    once: true,
+                  });
+                  safePush(ROUTES.HOME);
+                } else {
+                  auth.signOut();
+                }
               });
             return;
           }
