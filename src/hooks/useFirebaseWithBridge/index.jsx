@@ -8,7 +8,7 @@ import app from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 // import { setLogLevel } from 'firebase/app';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 
 import JSONPointer from '@beingenious/jsonpointer';
 import { initializeFirebase } from './firebaseConfig';
@@ -254,6 +254,36 @@ function useFirebaseWithBridge() {
     }
     return [false];
   }, [properties]);
+
+  useEffect(() => {
+    if (!firestore || firestore === false) {
+      return undefined;
+    }
+
+    let isProcessing = false;
+
+    const handleAppState = async (args) => {
+      const { state } = args?.[0] || {};
+
+      if (state === 'foreground' && !isProcessing) {
+        isProcessing = true;
+        try {
+          await firestore.disableNetwork();
+          await firestore.enableNetwork();
+        } catch (error) {
+          console.error('Error cycling Firestore network:', error);
+        } finally {
+          isProcessing = false;
+        }
+      }
+    };
+
+    PandaBridge.listen(PandaBridge.APP_STATE, handleAppState);
+
+    return () => {
+      PandaBridge.unlisten(PandaBridge.APP_STATE, handleAppState);
+    };
+  }, [firestore]);
 
   if (auth === null) {
     return null; /* Loading */
