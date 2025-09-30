@@ -222,19 +222,18 @@ function useFirebaseWithBridge() {
   });
 
   [auth, firestore] = useMemo(() => {
-    if (properties === undefined) {
-      return [null];
-    }
-
-    if (PandaBridge.isStudio && _.isEmpty(properties)) {
-      return [false];
-    }
-
     const mergeProperties = _.merge(
       {},
       properties,
       (properties.session || {}).properties,
     );
+
+    const hasFirebaseConfig =
+      mergeProperties.apiKey && mergeProperties.projectId;
+
+    if (!hasFirebaseConfig) {
+      return PandaBridge.isStudio ? [false] : [null];
+    }
 
     try {
       const initializedApp = initializeFirebase({
@@ -249,10 +248,9 @@ function useFirebaseWithBridge() {
 
       return [initializedApp.auth, initializedApp.firestore];
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error);
+      console.error(error);
+      return [false];
     }
-    return [false];
   }, [properties]);
 
   useEffect(() => {
