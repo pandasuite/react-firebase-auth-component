@@ -90,7 +90,9 @@ const SignIn = () => {
           {formik.errors && formik.errors.global && (
             <Alert type="danger" className="mt-6" isDismissible>
               {formik.errors.global.message}
-              {formik.errors.global.code === 'auth/wrong-password' && (
+              {['auth/wrong-password', 'auth/invalid-credential'].includes(
+                formik.errors.global.code,
+              ) && (
                 <>
                   <br />
                   <Button
