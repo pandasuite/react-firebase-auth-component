@@ -1,9 +1,9 @@
 {
   "form.required": "Required",
 
-  "page.invalid.message": "You need to provide valid Firebase credentials (apiKey, projectId).",
-  "page.invalid.link.name": "Learn more",
-  "page.invalid.link.value": "https://learn.pandasuite.com/hc/en-us/articles/360013987000-Add-User-Authentication-by-Firebase",
+  "auth.editor.alert.invalidConfig": "Firebase configuration is incomplete for the Auth component. Open PandaSuite Studio, select the Auth component, and fill in the Firebase API Key and Project ID before testing.",
+  "auth.editor.alert.invalidConfig.link.name": "Learn more",
+  "auth.editor.alert.invalidConfig.link.value": "https://learn.pandasuite.com/hc/en-us/articles/360013987000-Add-User-Authentication-by-Firebase",
 
   "page.signin.form.title": "Login to your Account",
   "page.signin.form.button": "Login",
@@ -53,5 +53,20 @@
   "page.passwordforget.form.input.email.placeholder": "Enter Email",
   "page.passwordforget.form.input.email.error": "Invalid email address",
   "page.passwordforget.form.signin.label": "Forget it, ",
-  "page.passwordforget.form.signin.action": "send me back to the sign in screen."
+  "page.passwordforget.form.signin.action": "send me back to the sign in screen.",
+
+  "session.editor.tab.session": "Test Session",
+  "session.editor.tab.schema": "Default user data",
+  "session.editor.alert.invalidConfig": "Firebase configuration is incomplete for the Session component. Provide the Firebase API Key and Project ID in PandaSuite Studio to continue.",
+  "session.editor.alert.initializing": "Initializing Firebase…",
+  "session.editor.card.title": "Session",
+  "session.editor.label.email": "Email",
+  "session.editor.label.uid": "UID",
+  "session.editor.label.firestoreDoc": "Firestore document",
+  "session.editor.button.signOut": "Sign out",
+  "session.editor.button.signIn": "Sign in",
+  "session.editor.field.email": "Email",
+  "session.editor.field.password": "Password",
+  "session.editor.helper.login": "Sign in with an email and password to simulate a user.\nUse this to see which data is loaded for different users.",
+  "session.editor.helper.schema": "Define the data that is created for every new user when they register. These default values are used to initialize your user profile in Firebase."
 }

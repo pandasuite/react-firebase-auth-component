@@ -21,6 +21,12 @@ const SignUp = () => {
   const { auth, firestore, bridge } = firebaseWithBridge || {};
   const { properties } = bridge || {};
   const { [PandaBridge.LANGUAGE]: language } = properties || {};
+  const defaultSchemaFromSession =
+    (properties &&
+      properties.session &&
+      properties.session.properties &&
+      properties.session.properties.defaultUserSchema) ||
+    {};
   const termsValidationSchema = {
     terms: Yup.bool()
       .required(intl.formatMessage({ id: 'form.required' }))
@@ -108,11 +114,11 @@ const SignUp = () => {
         .createUserWithEmailAndPassword(email, password)
         .then(() => {
           const { currentUser } = auth;
-          const fields = {
+          const fields = _.merge({}, defaultSchemaFromSession, {
             name,
             email,
             ...customFields,
-          };
+          });
           const requiresEmailVerification =
             properties.verifyEmail === true ||
             (properties.session &&

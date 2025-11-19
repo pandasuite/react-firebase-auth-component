@@ -8,7 +8,7 @@ import app from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 // import { setLogLevel } from 'firebase/app';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useCallback } from 'react';
 
 import JSONPointer from '@beingenious/jsonpointer';
 import { initializeFirebase } from './firebaseConfig';
@@ -205,7 +205,10 @@ function useFirebaseWithBridge() {
                 firestore
                   .collection('users')
                   .doc(cred.user.uid)
-                  .set({ email, ...traits }, { merge: true });
+                  .set(
+                    _.merge({}, getDefaultUserSchema(), { email, ...(traits || {}) }),
+                    { merge: true },
+                  );
               }
             })
             .catch((error) => {
@@ -221,15 +224,21 @@ function useFirebaseWithBridge() {
     },
   });
 
-  [auth, firestore] = useMemo(() => {
-    const mergeProperties = _.merge(
-      {},
-      properties,
-      (properties.session || {}).properties,
-    );
+  const mergedProperties = useMemo(
+    () => _.merge({}, properties, properties?.session?.properties),
+    [properties],
+  );
 
+  const getDefaultUserSchema = useCallback(
+    () => _.cloneDeep(mergedProperties?.defaultUserSchema || {}),
+    [mergedProperties],
+  );
+
+  [auth, firestore] = useMemo(() => {
     const hasFirebaseConfig =
-      mergeProperties.apiKey && mergeProperties.projectId;
+      mergedProperties &&
+      mergedProperties.apiKey &&
+      mergedProperties.projectId;
 
     if (!hasFirebaseConfig) {
       return PandaBridge.isStudio ? [false] : [null];
@@ -237,13 +246,13 @@ function useFirebaseWithBridge() {
 
     try {
       const initializedApp = initializeFirebase({
-        apiKey: mergeProperties.apiKey,
-        authDomain: mergeProperties.authDomain,
-        databaseURL: mergeProperties.databaseURL,
-        projectId: mergeProperties.projectId,
-        storageBucket: mergeProperties.storageBucket,
-        messagingSenderId: mergeProperties.messagingSenderId,
-        appId: mergeProperties.appId,
+        apiKey: mergedProperties.apiKey,
+        authDomain: mergedProperties.authDomain,
+        databaseURL: mergedProperties.databaseURL,
+        projectId: mergedProperties.projectId,
+        storageBucket: mergedProperties.storageBucket,
+        messagingSenderId: mergedProperties.messagingSenderId,
+        appId: mergedProperties.appId,
       });
 
       return [initializedApp.auth, initializedApp.firestore];
@@ -251,7 +260,7 @@ function useFirebaseWithBridge() {
       console.error(error);
       return [false];
     }
-  }, [properties]);
+  }, [mergedProperties]);
 
   useEffect(() => {
     if (!firestore || firestore === false) {
