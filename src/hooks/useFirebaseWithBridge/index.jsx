@@ -206,7 +206,10 @@ function useFirebaseWithBridge() {
                   .collection('users')
                   .doc(cred.user.uid)
                   .set(
-                    _.merge({}, getDefaultUserSchema(), { email, ...(traits || {}) }),
+                    _.merge({}, getDefaultUserSchema(), {
+                      email,
+                      ...(traits || {}),
+                    }),
                     { merge: true },
                   );
               }
@@ -236,9 +239,7 @@ function useFirebaseWithBridge() {
 
   [auth, firestore] = useMemo(() => {
     const hasFirebaseConfig =
-      mergedProperties &&
-      mergedProperties.apiKey &&
-      mergedProperties.projectId;
+      mergedProperties && mergedProperties.apiKey && mergedProperties.projectId;
 
     if (!hasFirebaseConfig) {
       return PandaBridge.isStudio ? [false] : [null];

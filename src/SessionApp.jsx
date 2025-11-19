@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
-import PandaBridge from 'pandasuite-bridge';
 
+import PandaBridge from 'pandasuite-bridge';
 import IntlProvider from './IntlProvider';
 import FirebaseBridgeContext from './FirebaseBridgeContext';
 import useFirebaseWithBridge from './hooks/useFirebaseWithBridge';
@@ -13,10 +13,7 @@ function SessionApp() {
   const firebaseWithBridge = useFirebaseWithBridge();
   const { bridge } = firebaseWithBridge || {};
   const { properties } = bridge || {};
-  const {
-    styles,
-    [PandaBridge.LANGUAGE]: language,
-  } = properties || {};
+  const { styles, [PandaBridge.LANGUAGE]: language } = properties || {};
 
   const showSessionSetup = PandaBridge.isStudio && properties !== undefined;
 
