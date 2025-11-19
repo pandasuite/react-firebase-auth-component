@@ -15,7 +15,9 @@ async function fixIndexDbBug() {
   }
 
   const databases = await window.indexedDB.databases();
-  const firestoreDb = find(databases, (db) => db?.name?.startsWith('firestore/'));
+  const firestoreDb = find(databases, (db) =>
+    db?.name?.startsWith('firestore/'),
+  );
 
   if (!firestoreDb) {
     return;
