@@ -38,6 +38,16 @@
       },
       "type": "Integer",
       "value": 0
+    },
+    {
+      "id": "defaultUserSchema",
+      "name": "Default user schema",
+      "locale_name": {
+        "fr_FR": "Schéma utilisateur par défaut"
+      },
+      "type": "JSON",
+      "value": {},
+      "hidden": true
     }
   ],
 

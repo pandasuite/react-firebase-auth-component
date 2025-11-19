@@ -1,9 +1,9 @@
 {
   "form.required": "Obligatoire",
 
-  "page.invalid.message": "Vous devez fournir des références Firebase valides (apiKey, projectId).",
-  "page.invalid.link.name": "En savoir plus",
-  "page.invalid.link.value": "https://learn.pandasuite.com/hc/fr-fr/articles/360013987000-Ajouter-l-authentification-utilisateur-par-Firebase",
+  "auth.editor.alert.invalidConfig": "La configuration Firebase du composant Auth est incomplète. Ouvrez PandaSuite Studio, sélectionnez le composant Auth et renseignez la clé API Firebase ainsi que l'ID de projet avant de le tester.",
+  "auth.editor.alert.invalidConfig.link.name": "En savoir plus",
+  "auth.editor.alert.invalidConfig.link.value": "https://learn.pandasuite.com/hc/fr-fr/articles/360013987000-Ajouter-l-authentification-utilisateur-par-Firebase",
 
   "page.signin.form.title": "Connectez-vous à votre compte",
   "page.signin.form.button": "Se connecter",
@@ -53,5 +53,20 @@
   "page.passwordforget.form.input.email.placeholder": "Entrez votre email",
   "page.passwordforget.form.input.email.error": "Email invalide",
   "page.passwordforget.form.signin.label": "Oubliez ça, ",
-  "page.passwordforget.form.signin.action": "revenir à l'écran d'identification."
+  "page.passwordforget.form.signin.action": "revenir à l'écran d'identification.",
+
+  "session.editor.tab.session": "Test Session",
+  "session.editor.tab.schema": "Données par défaut",
+  "session.editor.alert.invalidConfig": "La configuration Firebase du composant Session est incomplète. Renseignez la clé API et l'ID de projet Firebase dans PandaSuite Studio pour continuer.",
+  "session.editor.alert.initializing": "Initialisation de Firebase…",
+  "session.editor.card.title": "Session",
+  "session.editor.label.email": "Email",
+  "session.editor.label.uid": "UID",
+  "session.editor.label.firestoreDoc": "Document Firestore",
+  "session.editor.button.signOut": "Se déconnecter",
+  "session.editor.button.signIn": "Se connecter",
+  "session.editor.field.email": "Email",
+  "session.editor.field.password": "Mot de passe",
+  "session.editor.helper.login": "Connectez-vous avec un email et un mot de passe pour simuler un utilisateur.\nUtilisez ce test pour voir quelles données sont chargées pour différents utilisateurs.",
+  "session.editor.helper.schema": "Définissez les données créées pour chaque nouvel utilisateur lors de son inscription. Ces valeurs par défaut servent à initialiser le profil utilisateur dans Firebase."
 }

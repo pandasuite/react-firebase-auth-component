@@ -20,13 +20,17 @@ function InvalidPage() {
 
   return (
     <Alert type="warning" icon="alert-triangle">
-      {intl.formatMessage({ id: 'page.invalid.message' })}{' '}
+      {intl.formatMessage({ id: 'auth.editor.alert.invalidConfig' })}{' '}
       <a
         target="_blank"
         rel="noopener noreferrer"
-        href={intl.formatMessage({ id: 'page.invalid.link.value' })}
+        href={intl.formatMessage({
+          id: 'auth.editor.alert.invalidConfig.link.value',
+        })}
       >
-        {intl.formatMessage({ id: 'page.invalid.link.name' })}
+        {intl.formatMessage({
+          id: 'auth.editor.alert.invalidConfig.link.name',
+        })}
       </a>
     </Alert>
   );

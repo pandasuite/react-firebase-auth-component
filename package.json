@@ -4,6 +4,7 @@
   "homepage": "./",
   "private": true,
   "dependencies": {
+    "@beingenious/jsoneditor": "^0.12.3",
     "@beingenious/jsonpointer": "^1.0.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -13,7 +14,7 @@
     "idb": "^8.0.0",
     "lodash": "^4.17.21",
     "pandasuite-bridge": "^5.0.4",
-    "pandasuite-bridge-react": "^3.0.1",
+    "pandasuite-bridge-react": "^3.0.2",
     "prop-types": "^15.7.2",
     "react": "^18.2.0",
     "react-app-polyfill": "^1.0.6",
@@ -25,14 +26,18 @@
     "yup": "^0.28.1"
   },
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "serve": "vite preview",
-    "package-session": "cd src/json/session && cp ../../../pandasuite-component.zip ../../../pandasuite-session-component.zip && zip -ur ../../../pandasuite-session-component.zip pandasuite.json",
-    "package-auth": "cd src/json/auth && cp ../../../pandasuite-component.zip ../../../pandasuite-auth-component.zip && zip -ur ../../../pandasuite-auth-component.zip pandasuite.json",
-    "build-generic": "vite build && cd build && zip -r -X '../pandasuite-component.zip' *",
-    "clean": "rm -rf build && rm -f pandasuite-component.zip && rm -f pandasuite-auth-component.zip && rm -f pandasuite-session-component.zip",
-    "release": "yarn clean && yarn build-generic && yarn package-auth && yarn package-session && release-it --no-npm.publish"
+    "start": "node scripts/sync-pandasuite-json.js auth && cross-env VITE_APP_TARGET=auth vite",
+    "start:session": "node scripts/sync-pandasuite-json.js session && cross-env VITE_APP_TARGET=session vite",
+    "build:auth": "node scripts/sync-pandasuite-json.js auth && cross-env VITE_APP_TARGET=auth vite build --outDir build-auth --emptyOutDir && node scripts/sync-pandasuite-json.js clear",
+    "build:session": "node scripts/sync-pandasuite-json.js session && cross-env VITE_APP_TARGET=session vite build --outDir build-session --emptyOutDir && node scripts/sync-pandasuite-json.js clear",
+    "package:auth": "cp src/json/auth/pandasuite.json build-auth/pandasuite.json && cd build-auth && zip -r -X ../pandasuite-auth-component.zip *",
+    "package:session": "cp src/json/session/pandasuite.json build-session/pandasuite.json && cd build-session && zip -r -X ../pandasuite-session-component.zip *",
+    "build-all": "yarn clean && yarn build:auth && yarn package:auth && yarn build:session && yarn package:session && node scripts/sync-pandasuite-json.js clear",
+    "serve": "cross-env VITE_APP_TARGET=auth vite preview --outDir build-auth",
+    "serve:session": "cross-env VITE_APP_TARGET=session vite preview --outDir build-session",
+    "clean": "rm -rf build build-auth build-session && rm -f pandasuite-auth-component.zip pandasuite-session-component.zip public/pandasuite.json",
+    "clean:pandasuite": "node scripts/sync-pandasuite-json.js clear",
+    "release": "yarn build-all && release-it --no-npm.publish"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -53,15 +58,20 @@
     ]
   },
   "devDependencies": {
+    "@tailwindcss/postcss7-compat": "^2.1.0",
     "@vitejs/plugin-react-refresh": "^1.3.6",
-    "eslint": "^9.36.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "autoprefixer": "^9",
+    "cross-env": "^7.0.3",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.18.3",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "postcss": "^7",
+    "prettier": "^3.2.5",
     "release-it": "^13.0.1",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "vite": "^6.0.9"
   },
   "release-it": {

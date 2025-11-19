@@ -10,6 +10,8 @@
 
 # production
 /build
+/build-auth
+/build-session
 
 # misc
 .DS_Store
@@ -25,3 +27,4 @@ yarn-error.log*
 /pandasuite-component.zip
 /pandasuite-session-component.zip
 /pandasuite-auth-component.zip
+/public/pandasuite.json
