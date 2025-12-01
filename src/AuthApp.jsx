@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import PandaBridge from 'pandasuite-bridge';
 
@@ -22,11 +22,15 @@ function AuthApp() {
   const { properties } = bridge || {};
   const { styles, [PandaBridge.LANGUAGE]: language } = properties || {};
 
-  if (styles && typeof document !== 'undefined') {
+  useEffect(() => {
+    if (!styles) {
+      return undefined;
+    }
     const style = document.createElement('style');
     style.textContent = styles;
     document.head.append(style);
-  }
+    return () => style.remove();
+  }, [styles]);
 
   return (
     <FirebaseBridgeContext.Provider value={firebaseWithBridge}>

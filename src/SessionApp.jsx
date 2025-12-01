@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 
 import PandaBridge from 'pandasuite-bridge';
 import IntlProvider from './IntlProvider';
@@ -17,11 +17,15 @@ function SessionApp() {
 
   const showSessionSetup = PandaBridge.isStudio && properties !== undefined;
 
-  if (styles && typeof document !== 'undefined') {
+  useEffect(() => {
+    if (!styles) {
+      return undefined;
+    }
     const style = document.createElement('style');
     style.textContent = styles;
     document.head.append(style);
-  }
+    return () => style.remove();
+  }, [styles]);
 
   return (
     <FirebaseBridgeContext.Provider value={firebaseWithBridge}>

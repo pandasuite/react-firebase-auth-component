@@ -15,7 +15,7 @@ import {
   Alert,
 } from 'pandasuite-bridge-react';
 import PandaBridge, { Binder } from 'pandasuite-bridge';
-import isEqual from 'lodash/isEqual';
+import cloneDeep from 'lodash/cloneDeep';
 import { useIntl } from 'react-intl';
 
 import { JSONEditor } from '@beingenious/jsoneditor';
@@ -28,9 +28,16 @@ const editorConfig = {
   viewSwitchControl: true,
   buttonSave: false,
   readOnly: false,
-  view: 'raw',
   gridView: {
     sideBar: false,
+    columns: {
+      main: {
+        suppressHeaderMenuButton: true,
+        suppressHeaderContextMenu: true,
+        suppressHeaderFilterButton: true,
+        sortable: false,
+      },
+    },
   },
   rawView: {
     importJson: false,
@@ -57,20 +64,38 @@ function SessionSetup() {
     email: '',
     password: '',
   });
-  const [schema, setSchema] = useState(
-    () => properties?.defaultUserSchema || {},
+  const [schema, setSchema] = useState(() =>
+    cloneDeep(properties?.defaultUserSchema || {}),
   );
-  const schemaRef = useRef(schema);
 
   useEffect(() => {
-    schemaRef.current = schema;
-  }, [schema]);
-
-  useEffect(() => {
-    setSchema(properties?.defaultUserSchema || {});
+    setSchema(cloneDeep(properties?.defaultUserSchema || {}));
   }, [properties?.defaultUserSchema]);
 
   const shouldRender = PandaBridge.isStudio && properties !== undefined;
+
+  const { __ps_externalPaths: externalPaths, __ps_screens: rawScreens } =
+    bridgeProperties;
+
+  const jsonEditorMisc = useMemo(() => {
+    if (!Array.isArray(rawScreens)) {
+      return undefined;
+    }
+
+    const screens = rawScreens
+      .map((item) => item && item.value)
+      .filter((value) => value && value.did)
+      .map((value) => ({
+        id: value.did,
+        name: value.name || value.did,
+      }));
+
+    if (!screens.length) {
+      return undefined;
+    }
+
+    return { screens };
+  }, [rawScreens]);
 
   useEffect(() => {
     if (!shouldRender || !auth) {
@@ -108,8 +133,6 @@ function SessionSetup() {
 
     return () => unsubscribe();
   }, [currentUser, firestore]);
-
-  const externalPaths = bridgeProperties.__ps_externalPaths;
 
   const handleCredentialsChange = useCallback((event) => {
     const { name, value } = event.target;
@@ -150,11 +173,8 @@ function SessionSetup() {
 
   const handleSchemaChange = useCallback(
     (newSchema) => {
-      if (!isEqual(schemaRef.current, newSchema)) {
-        schemaRef.current = newSchema;
-        setSchema(newSchema);
-        setProperty('defaultUserSchema', newSchema);
-      }
+      setSchema(newSchema);
+      setProperty('defaultUserSchema', newSchema);
     },
     [setProperty],
   );
@@ -279,6 +299,7 @@ function SessionSetup() {
       <div className="flex-1 min-h-0 overflow-hidden">
         <JSONEditor
           data={schema}
+          misc={jsonEditorMisc}
           onChange={handleSchemaChange}
           config={editorConfig}
           externalPaths={externalPaths}
