@@ -74,12 +74,22 @@ function SessionSetup() {
 
   const shouldRender = PandaBridge.isStudio && properties !== undefined;
 
+  // Send defaultUserSchema as queryable when no user is logged in (studio mode)
+  useEffect(() => {
+    if (!shouldRender || currentUser) {
+      return;
+    }
+    PandaBridge.send(PandaBridge.UPDATED, {
+      queryable: schema,
+    });
+  }, [shouldRender, currentUser, schema]);
+
   const { __ps_externalPaths: externalPaths, __ps_screens: rawScreens } =
     bridgeProperties;
 
   const jsonEditorMisc = useMemo(() => {
     if (!Array.isArray(rawScreens)) {
-      return undefined;
+      return { screens: [] };
     }
 
     const screens = rawScreens
@@ -89,10 +99,6 @@ function SessionSetup() {
         id: value.did,
         name: value.name || value.did,
       }));
-
-    if (!screens.length) {
-      return undefined;
-    }
 
     return { screens };
   }, [rawScreens]);

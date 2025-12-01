@@ -48,7 +48,10 @@ function SessionRuntime() {
   useEffect(() => {
     if (!auth || !firestore) {
       if (auth === false) {
-        PandaBridge.send(PandaBridge.UPDATED, { queryable: {} });
+        // In studio mode, SessionSetup handles the queryable with defaultUserSchema
+        if (!PandaBridge.isStudio) {
+          PandaBridge.send(PandaBridge.UPDATED, { queryable: {} });
+        }
         PandaBridge.send('onSignedOut');
       }
       return undefined;
@@ -65,7 +68,10 @@ function SessionRuntime() {
 
       if (!user) {
         signedInTrigger = false;
-        PandaBridge.send(PandaBridge.UPDATED, { queryable: {} });
+        // In studio mode, SessionSetup handles the queryable with defaultUserSchema
+        if (!PandaBridge.isStudio) {
+          PandaBridge.send(PandaBridge.UPDATED, { queryable: {} });
+        }
         PandaBridge.send('onSignedOut');
         return;
       }
