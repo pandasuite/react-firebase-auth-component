@@ -43,11 +43,23 @@
           "id": "position",
           "label": "Position",
           "locale_label": {
-            "fr_FR": "Fonction"
+            "fr_FR": "Fonction",
+            "es_ES": "Cargo",
+            "it_IT": "Ruolo",
+            "pt_PT": "Cargo",
+            "pt-BR": "Cargo",
+            "nl_NL": "Functie",
+            "de_DE": "Position"
           },
           "placeholder": "Enter Position",
           "locale_placeholder": {
-            "fr_FR": "Fonction"
+            "fr_FR": "Fonction",
+            "es_ES": "Introduce tu cargo",
+            "it_IT": "Inserisci il tuo ruolo",
+            "pt_PT": "Insira seu cargo",
+            "pt-BR": "Insira seu cargo",
+            "nl_NL": "Vul je functie in",
+            "de_DE": "Gib deine Position ein"
           },
           "fieldType": "text",
           "required": true
@@ -56,11 +68,23 @@
           "id": "company",
           "label": "Company",
           "locale_label": {
-            "fr_FR": "Société"
+            "fr_FR": "Société",
+            "es_ES": "Empresa",
+            "it_IT": "Azienda",
+            "pt_PT": "Empresa",
+            "pt-BR": "Empresa",
+            "nl_NL": "Bedrijf",
+            "de_DE": "Unternehmen"
           },
           "placeholder": "Enter Company",
           "locale_placeholder": {
-            "fr_FR": "Société"
+            "fr_FR": "Société",
+            "es_ES": "Introduce tu empresa",
+            "it_IT": "Inserisci la tua azienda",
+            "pt_PT": "Insira sua empresa",
+            "pt-BR": "Insira sua empresa",
+            "nl_NL": "Vul je bedrijf in",
+            "de_DE": "Gib dein Unternehmen ein"
           },
           "fieldType": "text",
           "required": false

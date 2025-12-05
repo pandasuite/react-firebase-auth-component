@@ -18,6 +18,7 @@
 
   "page.signup.form.title": "Créer un nouveau compte",
   "page.signup.form.button": "Créer un nouveau compte",
+  "page.signup.form.forgot.label": "Mot de passe oublié ?",
   "page.signup.form.terms": "En vous inscrivant, vous acceptez nos communications et nos conditions d'utilisation",
   "page.signup.form.input.name.label": "Nom complet",
   "page.signup.form.input.name.placeholder": "Entrez votre nom complet",
