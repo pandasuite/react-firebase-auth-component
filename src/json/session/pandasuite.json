@@ -176,82 +176,8 @@
       },
       "params": [
         {
-          "id": "data",
-          "name": "Target",
-          "locale_name": {
-            "fr_FR": "Cible"
-          },
-          "type": "String",
-          "style": "Explorer"
-        },
-        {
-          "id": "function",
-          "name": "Function",
-          "locale_name": {
-            "fr_FR": "Fonction"
-          },
-          "value": "set",
-          "type": "Dropdown",
-          "items": [
-            {
-              "id": "set",
-              "name": "Set",
-              "locale_name": {
-                "fr_FR": "Définir"
-              }
-            },
-            {
-              "id": "inc",
-              "name": "Increment",
-              "locale_name": {
-                "fr_FR": "Incrémenter"
-              }
-            },
-            {
-              "id": "dec",
-              "name": "Decrement",
-              "locale_name": {
-                "fr_FR": "Décrémenter"
-              }
-            },
-            {
-              "id": "add",
-              "name": "Add",
-              "locale_name": {
-                "fr_FR": "Ajouter"
-              }
-            },
-            {
-              "id": "del",
-              "name": "Delete",
-              "locale_name": {
-                "fr_FR": "Supprimer"
-              }
-            },
-            {
-              "id": "delbyid",
-              "name": "Delete by id",
-              "locale_name": {
-                "fr_FR": "Supprimer par id"
-              }
-            },
-            {
-              "id": "delbyvalue",
-              "name": "Delete by value",
-              "locale_name": {
-                "fr_FR": "Supprimer par valeur"
-              }
-            }
-          ]
-        },
-        {
-          "id": "value",
-          "name": "Value",
-          "locale_name": {
-            "fr_FR": "Valeur"
-          },
-          "type": "JSON",
-          "bindable": true
+          "id": "modify",
+          "type": "ModifyData"
         }
       ]
     },

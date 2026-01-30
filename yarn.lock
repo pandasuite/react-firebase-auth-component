@@ -203,20 +203,22 @@
     "@babel/helper-string-parser" "^7.25.9"
     "@babel/helper-validator-identifier" "^7.25.9"
 
-"@beingenious/jsoneditor@^0.13.4":
-  version "0.13.4"
-  resolved "https://npm.pkg.github.com/download/@beingenious/jsoneditor/0.13.4/59cc0852a13b90195da175ca31fbfc82bfa9521e#59cc0852a13b90195da175ca31fbfc82bfa9521e"
-  integrity sha512-Hqoi/qq7d18GWZkJsYImgyNGjNOgT7CIWrTMSAfGz3XJrk81u9210OrthcmJvwxZ09vluybEqnbOUtrN6WjxMQ==
+"@beingenious/jsoneditor@^0.14.8":
+  version "0.14.8"
+  resolved "https://npm.pkg.github.com/download/@beingenious/jsoneditor/0.14.8/330e494db98f03c068691f173091c3ca528300b2#330e494db98f03c068691f173091c3ca528300b2"
+  integrity sha512-wkrw//nb+8QtlL7Z/iT2CXh1D7AuVbh/2dO59X1tz4ys9qiOGO3o9qB357Ht+sMHflb2FBaJH3P6y08VvqBMUQ==
   dependencies:
     "@ag-grid-community/locale" "^34.0.0"
-    "@beingenious/jsonpointer" "^2.0.14"
+    "@beingenious/jsonpointer" "^2.1.4"
     "@codemirror/lang-json" "^6.0.1"
     "@headlessui/react" "^2.0.4"
     "@heroicons/react" "^2.1.3"
     "@nanostores/react" "^0.7.2"
     "@radix-ui/react-dialog" "^1.1.15"
     "@radix-ui/react-popover" "^1.1.15"
+    "@radix-ui/react-progress" "^1.1.8"
     "@radix-ui/react-slot" "^1.2.4"
+    "@react-stately/flags" "^3.1.2"
     "@rollup/plugin-alias" "^5.1.0"
     "@uiw/react-codemirror" "^4.22.2"
     ag-grid-enterprise "~34.0.0"
@@ -227,24 +229,13 @@
     crypto-js "^4.2.0"
     flag-icons "^7.2.3"
     lodash "^4.17.21"
-    lucide-react "^0.554.0"
     nanostores "^0.10.3"
-    react "^17.0.0 || ^18.0.0"
     react-best-gradient-color-picker "3.0.8"
-    react-dom "^17.0.0 || ^18.0.0"
     tailwind-merge "^3.4.0"
     tailwindcss-animate "^1.0.7"
     use-eye-dropper "^1.6.1"
 
-"@beingenious/jsonpointer@^1.0.3":
-  version "1.0.3"
-  resolved "https://npm.pkg.github.com/download/@beingenious/jsonpointer/1.0.3/4f66ed256becb21775d29811c1e1c2ea34c30462#4f66ed256becb21775d29811c1e1c2ea34c30462"
-  integrity sha512-VwfLJD9zicmUYi/3wQ8aeU6n9YNE94icSPXBxBlhIzl+lDgPaI6EWWZRLmdfEhzofDyxIYIMHWMFY6Fcul6Gww==
-  dependencies:
-    lodash "^4.17.21"
-    marked "^3.0.4"
-
-"@beingenious/jsonpointer@^2.0.14":
+"@beingenious/jsonpointer@^2.1.4":
   version "2.1.4"
   resolved "https://npm.pkg.github.com/download/@beingenious/jsonpointer/2.1.4/85a3de47438d8cc0309883afec9027fe0bd55598#85a3de47438d8cc0309883afec9027fe0bd55598"
   integrity sha512-GYrjnHtQwxuXkyMzGQ6IVAy/1m8QdZqWWDPq34t7NE5+giY+bIj6gQodhCemlo508giEaSMRUp/JeBxEbfKF4A==
@@ -253,6 +244,17 @@
     date-fns-tz "^2.0.0"
     lodash "^4.17.21"
     marked "^4.0.0"
+
+"@beingenious/jsonpointer@^3.6.1":
+  version "3.6.1"
+  resolved "https://npm.pkg.github.com/download/@beingenious/jsonpointer/3.6.1/73a274e82b87428a0b89ec05f43561af1a1a5049#73a274e82b87428a0b89ec05f43561af1a1a5049"
+  integrity sha512-dz+rl4KYjpSMU0z12Y+bPFMWq4GDUG/rumDllGLm5dj2SrwuWyXYBscEij1+INhkQzcODN5wf54nQJydWYYWig==
+  dependencies:
+    date-fns "^2.30.0"
+    date-fns-tz "^2.0.0"
+    lodash-es "^4.17.21"
+  optionalDependencies:
+    markdown-it "^14.0.0"
 
 "@codemirror/autocomplete@^6.0.0":
   version "6.19.1"
@@ -1239,6 +1241,11 @@
   resolved "https://registry.yarnpkg.com/@radix-ui/react-context/-/react-context-1.1.2.tgz#61628ef269a433382c364f6f1e3788a6dc213a36"
   integrity sha512-jCi/QKUM2r1Ju5a3J64TH2A5SpKAgh0LpknyqdQ4m6DCV0xJ2HG1xARRwNGPQfi1SLdLWZ1OJz6F4OMBBNiGJA==
 
+"@radix-ui/react-context@1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-context/-/react-context-1.1.3.tgz#81286f643b310d040eaac13b18e223130861d839"
+  integrity sha512-ieIFACdMpYfMEjF0rEf5KLvfVyIkOz6PDGyNnP+u+4xQ6jny3VCgA4OgXOwNx2aUkxn8zx9fiVcM8CfFYv9Lxw==
+
 "@radix-ui/react-dialog@^1.1.15", "@radix-ui/react-dialog@^1.1.6":
   version "1.1.15"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-dialog/-/react-dialog-1.1.15.tgz#1de3d7a7e9a17a9874d29c07f5940a18a119b632"
@@ -1351,12 +1358,20 @@
   dependencies:
     "@radix-ui/react-slot" "1.2.3"
 
-"@radix-ui/react-primitive@^2.0.2":
+"@radix-ui/react-primitive@2.1.4", "@radix-ui/react-primitive@^2.0.2":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-primitive/-/react-primitive-2.1.4.tgz#2626ea309ebd63bf5767d3e7fc4081f81b993df0"
   integrity sha512-9hQc4+GNVtJAIEPEqlYqW5RiYdrr8ea5XQ0ZOnD6fgru+83kqT15mq2OCcbe8KnjRZl5vF3ks69AKz3kh1jrhg==
   dependencies:
     "@radix-ui/react-slot" "1.2.4"
+
+"@radix-ui/react-progress@^1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-progress/-/react-progress-1.1.8.tgz#9f9a68d75bf763f9c64808724a83d2de804bd061"
+  integrity sha512-+gISHcSPUJ7ktBy9RnTqbdKW78bcGke3t6taawyZ71pio1JewwGSJizycs7rLhGTvMJYCQB1DBK4KQsxs7U8dA==
+  dependencies:
+    "@radix-ui/react-context" "1.1.3"
+    "@radix-ui/react-primitive" "2.1.4"
 
 "@radix-ui/react-slot@1.2.3":
   version "1.2.3"
@@ -2069,6 +2084,11 @@ argparse@^1.0.7:
   integrity sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==
   dependencies:
     sprintf-js "~1.0.2"
+
+argparse@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/argparse/-/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
+  integrity sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==
 
 aria-hidden@^1.2.4:
   version "1.2.6"
@@ -3197,6 +3217,11 @@ end-of-stream@^1.1.0:
   integrity sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==
   dependencies:
     once "^1.4.0"
+
+entities@^4.4.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/entities/-/entities-4.5.0.tgz#5d268ea5e7113ec74c4d033b79ea5a35a488fb48"
+  integrity sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==
 
 error-ex@^1.3.1:
   version "1.3.2"
@@ -5175,6 +5200,13 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
+linkify-it@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/linkify-it/-/linkify-it-5.0.0.tgz#9ef238bfa6dc70bd8e7f9572b52d369af569b421"
+  integrity sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ==
+  dependencies:
+    uc.micro "^2.0.0"
+
 locate-path@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/locate-path/-/locate-path-5.0.0.tgz#1afba396afd676a6d42504d0a67a3a7eb9f62aa0"
@@ -5263,11 +5295,6 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-lucide-react@^0.554.0:
-  version "0.554.0"
-  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.554.0.tgz#85ee9855d43cfa83f6077125fe9dbe2521bdf37d"
-  integrity sha512-St+z29uthEJVx0Is7ellNkgTEhaeSoA42I7JjOCBCrc5X6LYMGSv0P/2uS5HDLTExP5tpiqRD2PyUEOS6s9UXA==
-
 macos-release@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/macos-release/-/macos-release-2.3.0.tgz#eb1930b036c0800adebccd5f17bc4c12de8bb71f"
@@ -5280,10 +5307,17 @@ make-dir@^3.0.0:
   dependencies:
     semver "^6.0.0"
 
-marked@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-3.0.4.tgz#b8a1539e5e05c6ea9e93f15c0bad1d54ce890406"
-  integrity sha512-jBo8AOayNaEcvBhNobg6/BLhdsK3NvnKWJg33MAAPbvTWiG4QBn9gpW1+7RssrKu4K1dKlN+0goVQwV41xEfOA==
+markdown-it@^14.0.0:
+  version "14.1.0"
+  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-14.1.0.tgz#3c3c5992883c633db4714ccb4d7b5935d98b7d45"
+  integrity sha512-a54IwgWPaeBCAAsv13YgmALOF1elABB08FxO9i+r4VFk5Vl4pKokRPeX8u5TCgSsPi6ec1otfLjdOpVcgbpshg==
+  dependencies:
+    argparse "^2.0.1"
+    entities "^4.4.0"
+    linkify-it "^5.0.0"
+    mdurl "^2.0.0"
+    punycode.js "^2.3.1"
+    uc.micro "^2.1.0"
 
 marked@^4.0.0:
   version "4.3.0"
@@ -5294,6 +5328,11 @@ math-intrinsics@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/math-intrinsics/-/math-intrinsics-1.1.0.tgz#a0dd74be81e2aa5c2f27e65ce283605ee4e2b7f9"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
+
+mdurl@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/mdurl/-/mdurl-2.0.0.tgz#80676ec0433025dd3e17ee983d0fe8de5a2237e0"
+  integrity sha512-Lf+9+2r+Tdp5wXDXC4PcIBjTDtq4UKjCPMQhKIuzpJNW0b96kVqSwW0bT7FhRSfmAiFYgP+SCRvdrDozfh0U5w==
 
 merge-stream@^2.0.0:
   version "2.0.0"
@@ -6023,6 +6062,11 @@ pump@^3.0.0:
     end-of-stream "^1.1.0"
     once "^1.3.1"
 
+punycode.js@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/punycode.js/-/punycode.js-2.3.1.tgz#6b53e56ad75588234e79f4affa90972c7dd8cdb7"
+  integrity sha512-uxFIHU0YlHYhDQtV4R9J6a52SLx28BCjT+4ieh7IGbgwVJWO+km431c4yRlREUAsAmt/uMjQUyQHNEPf0M39CA==
+
 punycode@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
@@ -6088,7 +6132,7 @@ react-best-gradient-color-picker@3.0.8:
     lodash.throttle "^4.1.1"
     tinycolor2 "1.4.2"
 
-"react-dom@^17.0.0 || ^18.0.0", react-dom@^18.2.0:
+react-dom@^18.2.0:
   version "18.3.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.3.1.tgz#c2265d79511b57d479b3dd3fdfa51536494c5cb4"
   integrity sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==
@@ -6215,7 +6259,7 @@ react-text-mask@^5.4.1:
   dependencies:
     prop-types "^15.5.6"
 
-"react@^17.0.0 || ^18.0.0", react@^18.2.0:
+react@^18.2.0:
   version "18.3.1"
   resolved "https://registry.yarnpkg.com/react/-/react-18.3.1.tgz#49ab892009c53933625bd16b2533fc754cab2891"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
@@ -7308,6 +7352,11 @@ typedarray-to-buffer@^3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
+
+uc.micro@^2.0.0, uc.micro@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/uc.micro/-/uc.micro-2.1.0.tgz#f8d3f7d0ec4c3dea35a7e3c8efa4cb8b45c9e7ee"
+  integrity sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==
 
 unbox-primitive@^1.0.2:
   version "1.0.2"
