@@ -245,10 +245,10 @@
     lodash "^4.17.21"
     marked "^4.0.0"
 
-"@beingenious/jsonpointer@^3.6.1":
-  version "3.6.1"
-  resolved "https://npm.pkg.github.com/download/@beingenious/jsonpointer/3.6.1/73a274e82b87428a0b89ec05f43561af1a1a5049#73a274e82b87428a0b89ec05f43561af1a1a5049"
-  integrity sha512-dz+rl4KYjpSMU0z12Y+bPFMWq4GDUG/rumDllGLm5dj2SrwuWyXYBscEij1+INhkQzcODN5wf54nQJydWYYWig==
+"@beingenious/jsonpointer@^3.6.2":
+  version "3.6.2"
+  resolved "https://npm.pkg.github.com/download/@beingenious/jsonpointer/3.6.2/cb05cb0f473c74e039497659b76879e4b3cacbc5#cb05cb0f473c74e039497659b76879e4b3cacbc5"
+  integrity sha512-C3cTbDp698++GGbuuLhZbFVpjB3vNJCuUkpXTwiRbx15jYeVJBol79IFFSYL79TKcFQ2Zyoxti364IVkuygDag==
   dependencies:
     date-fns "^2.30.0"
     date-fns-tz "^2.0.0"

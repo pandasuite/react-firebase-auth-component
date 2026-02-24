@@ -11,6 +11,7 @@ import { useMemo, useEffect, useCallback } from 'react';
 
 import { JSONPointer, ModifyData } from '@beingenious/jsonpointer';
 import { initializeFirebase } from './firebaseConfig';
+import { normalizeCollectionsForStorage } from './collectionStorageAdapter.mjs';
 import { buildUserDocUpdate } from './modifyDataAdapter.mjs';
 
 let firestore = null;
@@ -180,7 +181,10 @@ function useFirebaseWithBridge() {
   );
 
   const getDefaultUserSchema = useCallback(
-    () => _.cloneDeep(mergedProperties?.defaultUserSchema || {}),
+    () =>
+      normalizeCollectionsForStorage(
+        _.cloneDeep(mergedProperties?.defaultUserSchema || {}),
+      ),
     [mergedProperties],
   );
 

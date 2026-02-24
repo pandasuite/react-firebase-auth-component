@@ -7,6 +7,7 @@ import PandaBridge from 'pandasuite-bridge';
 import * as ROUTES from '../../constants/routes';
 import StandaloneFormPage from '../StandaloneFormPage';
 import FirebaseBridgeContext from '../../FirebaseBridgeContext';
+import { toQueryableShape } from '../../hooks/useFirebaseWithBridge/collectionStorageAdapter.mjs';
 
 const VerifyEmail = () => {
   const firebaseWithBridge = useContext(FirebaseBridgeContext);
@@ -33,7 +34,7 @@ const VerifyEmail = () => {
         .doc(currentUser.uid)
         .onSnapshot(
           (snapshot) => {
-            const data = snapshot.data();
+            const data = toQueryableShape(snapshot.data() || {});
 
             PandaBridge.send(PandaBridge.UPDATED, {
               queryable: { ...data, id: currentUser.uid },

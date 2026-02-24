@@ -22,6 +22,7 @@ import { JSONEditor } from '@beingenious/jsoneditor';
 import '@beingenious/jsoneditor/dist/style.css';
 
 import FirebaseBridgeContext from '../../FirebaseBridgeContext';
+import { toQueryableShape } from '../../hooks/useFirebaseWithBridge/collectionStorageAdapter.mjs';
 
 const editorConfig = {
   title: null,
@@ -80,7 +81,7 @@ function SessionSetup() {
       return;
     }
     PandaBridge.send(PandaBridge.UPDATED, {
-      queryable: schema,
+      queryable: toQueryableShape(schema),
     });
   }, [shouldRender, currentUser, schema]);
 

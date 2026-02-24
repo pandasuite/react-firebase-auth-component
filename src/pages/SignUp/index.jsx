@@ -12,6 +12,7 @@ import PandaBridge from 'pandasuite-bridge';
 import * as ROUTES from '../../constants/routes';
 import StandaloneFormPage from '../StandaloneFormPage';
 import FirebaseBridgeContext from '../../FirebaseBridgeContext';
+import { normalizeCollectionsForStorage } from '../../hooks/useFirebaseWithBridge/collectionStorageAdapter.mjs';
 
 const SignUp = () => {
   const firebaseWithBridge = useContext(FirebaseBridgeContext);
@@ -119,6 +120,7 @@ const SignUp = () => {
             email,
             ...customFields,
           });
+          const fieldsForStorage = normalizeCollectionsForStorage(fields);
           const requiresEmailVerification =
             properties.verifyEmail === true ||
             (properties.session &&
@@ -132,7 +134,7 @@ const SignUp = () => {
           firestore
             .collection('users')
             .doc(currentUser.uid)
-            .set(fields)
+            .set(fieldsForStorage)
             .then(() => {
               formik.setSubmitting(false);
             })

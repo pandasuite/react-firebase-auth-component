@@ -5,6 +5,7 @@ import { deleteDB, openDB } from 'idb';
 import { find } from 'lodash';
 
 import FirebaseBridgeContext from '../../FirebaseBridgeContext';
+import { toQueryableShape } from '../../hooks/useFirebaseWithBridge/collectionStorageAdapter.mjs';
 
 async function fixIndexDbBug() {
   if (!window.indexedDB) {
@@ -51,7 +52,7 @@ const Home = () => {
         .doc(currentUser.uid)
         .onSnapshot(
           (snapshot) => {
-            const data = snapshot.data();
+            const data = toQueryableShape(snapshot.data() || {});
 
             PandaBridge.send(PandaBridge.UPDATED, {
               queryable: { ...data, id: currentUser.uid },
