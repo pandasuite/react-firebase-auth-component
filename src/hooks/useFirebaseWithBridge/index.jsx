@@ -14,6 +14,7 @@ import { initializeFirebase } from './firebaseConfig';
 import { generateAuthTokenAction } from './generateAuthTokenAction.mjs';
 import { normalizeCollectionsForStorage } from './collectionStorageAdapter.mjs';
 import { buildUserDocUpdate } from './modifyDataAdapter.mjs';
+import { createChangeActionController } from './changeActionController.mjs';
 
 let firestore = null;
 let auth = null;
@@ -56,6 +57,20 @@ const changeData = ({ user, modify }) => {
 };
 
 function useFirebaseWithBridge() {
+  const sendChangeError = useCallback((code, message) => {
+    PandaBridge.send('onChangeError', [{ code, message }]);
+  }, []);
+  const changeActionController = useMemo(
+    () =>
+      createChangeActionController({
+        applyChange: ({ user, modify }) => {
+          changeData({ user, modify });
+        },
+        sendChangeError,
+      }),
+    [sendChangeError],
+  );
+
   const { properties } = usePandaBridge({
     actions: {
       signOut: () => {
@@ -95,28 +110,7 @@ function useFirebaseWithBridge() {
         });
       },
       change: (payload) => {
-        const { currentUser } = auth;
-        if (!payload || typeof payload !== 'object') {
-          return;
-        }
-
-        const { property, func, value } = payload;
-        if (property == null) {
-          return;
-        }
-
-        const modify = { property, func, value };
-
-        if (currentUser) {
-          changeData({ user: currentUser, modify });
-        } else {
-          const unsubscribe = auth.onAuthStateChanged((user) => {
-            if (user) {
-              unsubscribe();
-              changeData({ user, modify });
-            }
-          });
-        }
+        changeActionController.handleIncomingChange({ payload, auth });
       },
       registerWithEmailAndPassword: ({ email, password, traits }) => {
         if (auth && email && password) {
@@ -187,6 +181,32 @@ function useFirebaseWithBridge() {
       return [false];
     }
   }, [mergedProperties]);
+
+  useEffect(() => {
+    if (
+      auth === false ||
+      auth === null ||
+      typeof auth?.onAuthStateChanged !== 'function'
+    ) {
+      changeActionController.syncAuth(auth);
+      return undefined;
+    }
+
+    changeActionController.syncAuth(auth);
+
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      changeActionController.syncAuth({ currentUser: user });
+    });
+
+    return () => unsubscribe();
+  }, [auth, changeActionController]);
+
+  useEffect(
+    () => () => {
+      changeActionController.dispose();
+    },
+    [changeActionController],
+  );
 
   useEffect(() => {
     if (!firestore || firestore === false) {
