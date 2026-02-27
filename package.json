@@ -26,15 +26,16 @@
     "yup": "^0.28.1"
   },
   "scripts": {
-    "start": "node scripts/sync-pandasuite-json.js auth && cross-env VITE_APP_TARGET=auth vite",
-    "start:session": "node scripts/sync-pandasuite-json.js session && cross-env VITE_APP_TARGET=session vite",
-    "build:auth": "node scripts/sync-pandasuite-json.js auth && cross-env VITE_APP_TARGET=auth vite build --outDir build-auth --emptyOutDir && node scripts/sync-pandasuite-json.js clear",
-    "build:session": "node scripts/sync-pandasuite-json.js session && cross-env VITE_APP_TARGET=session vite build --outDir build-session --emptyOutDir && node scripts/sync-pandasuite-json.js clear",
+    "start": "vite",
+    "start:auth": "vite --open /auth.html",
+    "start:session": "vite --open /session.html",
+    "build:auth": "cross-env VITE_APP_TARGET=auth vite build --outDir build-auth --emptyOutDir",
+    "build:session": "cross-env VITE_APP_TARGET=session vite build --outDir build-session --emptyOutDir && mv build-session/session.html build-session/index.html",
     "package:auth": "cp src/json/auth/pandasuite.json build-auth/pandasuite.json && cd build-auth && zip -r -X ../pandasuite-auth-component.zip *",
     "package:session": "cp src/json/session/pandasuite.json build-session/pandasuite.json && cd build-session && zip -r -X ../pandasuite-session-component.zip *",
-    "build-all": "yarn clean && yarn build:auth && yarn package:auth && yarn build:session && yarn package:session && node scripts/sync-pandasuite-json.js clear",
-    "serve": "cross-env VITE_APP_TARGET=auth vite preview --outDir build-auth",
-    "serve:session": "cross-env VITE_APP_TARGET=session vite preview --outDir build-session",
+    "build-all": "yarn clean && yarn build:auth && yarn package:auth && yarn build:session && yarn package:session",
+    "serve": "vite preview --outDir build-auth",
+    "serve:session": "vite preview --outDir build-session",
     "clean": "rm -rf build build-auth build-session && rm -f pandasuite-auth-component.zip pandasuite-session-component.zip public/pandasuite.json",
     "clean:pandasuite": "node scripts/sync-pandasuite-json.js clear",
     "release": "yarn build-all && release-it --no-npm.publish"
