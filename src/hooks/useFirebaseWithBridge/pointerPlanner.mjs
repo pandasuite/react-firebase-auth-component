@@ -1,5 +1,6 @@
 const TARGETABLE_SELECTOR_FUNCS = new Set([
   'getById',
+  'getByIndex',
   'find',
   'minBy',
   'maxBy',
