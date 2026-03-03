@@ -6,7 +6,10 @@ export const toQueuedChangeModify = (payload) => {
     return null;
   }
 
-  const { property, func, value } = payload;
+  const property = payload.property ?? payload.data;
+  const func = payload.func ?? payload.function;
+  const { value } = payload;
+
   if (property == null) {
     return null;
   }

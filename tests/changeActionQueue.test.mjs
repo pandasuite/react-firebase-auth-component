@@ -31,6 +31,37 @@ test('toQueuedChangeModify keeps property/func/value for valid payloads', () => 
   );
 });
 
+test('toQueuedChangeModify falls back to legacy data/function fields', () => {
+  assert.deepEqual(
+    toQueuedChangeModify({
+      data: '/Journal/@getByIndex:11',
+      function: 'set',
+      value: 'hello',
+    }),
+    {
+      property: '/Journal/@getByIndex:11',
+      func: 'set',
+      value: 'hello',
+    },
+  );
+});
+
+test('toQueuedChangeModify prefers property over data when both present', () => {
+  assert.deepEqual(
+    toQueuedChangeModify({
+      property: '/new',
+      data: '/old',
+      func: 'set',
+      value: 1,
+    }),
+    {
+      property: '/new',
+      func: 'set',
+      value: 1,
+    },
+  );
+});
+
 test('describeChangeAuthState classifies auth bootstrap states', () => {
   assert.equal(describeChangeAuthState(false), 'invalid-config');
   assert.equal(describeChangeAuthState(null), 'waiting-for-auth');
