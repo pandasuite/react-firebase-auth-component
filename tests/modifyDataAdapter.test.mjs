@@ -35,6 +35,228 @@ test('buildUserDocUpdate uses FieldValue.increment on simple paths', () => {
   assert.deepEqual(update, { count: { __op: 'increment', n: 2 } });
 });
 
+test('buildUserDocUpdate keeps @getByKey segment for nested inc updates', () => {
+  const { buildUserDocUpdate } = modifyDataAdapter;
+  const userData = {
+    Points: {
+      'Wed, 3-04-26': {
+        Times_accomplished_each_discipline: {
+          Meditation: 2,
+        },
+      },
+    },
+  };
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property:
+        '/Points/@getByKey:Wed, 3-04-26/Times_accomplished_each_discipline/Meditation',
+      func: 'inc',
+      value: 1,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.deepEqual(update, {
+    'Points.Wed, 3-04-26.Times_accomplished_each_discipline.Meditation': {
+      __op: 'increment',
+      n: 1,
+    },
+  });
+});
+
+test('buildUserDocUpdate keeps numeric @getByKey values as map keys', () => {
+  const { buildUserDocUpdate } = modifyDataAdapter;
+  const userData = {
+    Buckets: {
+      0: {
+        score: 1,
+      },
+    },
+  };
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: '/Buckets/@getByKey:0/score',
+      func: 'inc',
+      value: 2,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.deepEqual(update, {
+    'Buckets.0.score': {
+      __op: 'increment',
+      n: 2,
+    },
+  });
+});
+
+test('buildUserDocUpdate rewrites parent map for @getByKey keys containing dots', () => {
+  const { buildUserDocUpdate } = modifyDataAdapter;
+  const userData = {
+    Points: {
+      'Thu.03': { score: 1 },
+      Safe: { score: 9 },
+    },
+  };
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: '/Points/@getByKey:Thu.03/score',
+      func: 'inc',
+      value: 1,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.deepEqual(Object.keys(update), ['Points']);
+  assert.deepEqual(update.Points['Thu.03'].score, {
+    __op: 'increment',
+    n: 1,
+  });
+  assert.deepEqual(update.Points.Safe, { score: 9 });
+});
+
+test('buildUserDocUpdate rewrites whole document for root @getByKey keys containing dots', () => {
+  const { buildUserDocUpdate, REPLACE_DOCUMENT_UPDATE } = modifyDataAdapter;
+  const userData = {
+    'Thu.03': { score: 1 },
+    Safe: { score: 9 },
+  };
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: '/@getByKey:Thu.03/score',
+      func: 'inc',
+      value: 1,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.deepEqual(Object.keys(update), []);
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(update, REPLACE_DOCUMENT_UPDATE),
+    true,
+  );
+  assert.deepEqual(update[REPLACE_DOCUMENT_UPDATE]['Thu.03'].score, {
+    __op: 'increment',
+    n: 1,
+  });
+  assert.deepEqual(update[REPLACE_DOCUMENT_UPDATE].Safe, { score: 9 });
+});
+
+test('buildUserDocUpdate does not collide replacement sentinel with user field names', () => {
+  const { buildUserDocUpdate, REPLACE_DOCUMENT_UPDATE } = modifyDataAdapter;
+  const userData = {};
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: '/__replaceDocument',
+      func: 'set',
+      value: { ok: true },
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(update, REPLACE_DOCUMENT_UPDATE),
+    false,
+  );
+  assert.deepEqual(update, {
+    __replaceDocument: { ok: true },
+  });
+});
+
+test('buildUserDocUpdate scopes non-set @getByKey array updates to the keyed branch', () => {
+  const { buildUserDocUpdate } = modifyDataAdapter;
+  const userData = {
+    Points: {
+      d1: {
+        items: [
+          { id: '1', tags: ['a'] },
+          { id: '2', tags: ['b'] },
+        ],
+      },
+      d2: {
+        items: [{ id: '9', tags: ['z'] }],
+      },
+    },
+  };
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: '/Points/@getByKey:d1/items/@getById:2/tags',
+      func: 'add',
+      value: 'c',
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.deepEqual(Object.keys(update), ['Points.d1.items']);
+  assert.deepEqual(update['Points.d1.items'], [
+    { id: '1', tags: ['a'] },
+    { id: '2', tags: ['b', 'c'] },
+  ]);
+});
+
+test('buildUserDocUpdate rewrites keyed parent for non-set @getByKey arrays when key has dots', () => {
+  const { buildUserDocUpdate } = modifyDataAdapter;
+  const userData = {
+    Points: {
+      'Thu.03': {
+        items: [
+          { id: '1', tags: ['a'] },
+          { id: '2', tags: ['b'] },
+        ],
+      },
+    },
+  };
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: '/Points/@getByKey:Thu.03/items/@getById:2/tags',
+      func: 'add',
+      value: 'c',
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.deepEqual(Object.keys(update), ['Points']);
+  assert.deepEqual(update.Points['Thu.03'].items, [
+    { id: '1', tags: ['a'] },
+    { id: '2', tags: ['b', 'c'] },
+  ]);
+});
+
 test('buildUserDocUpdate preserves decimal precision for inc', () => {
   const { buildUserDocUpdate } = modifyDataAdapter;
   const userData = { count: 1 };
@@ -654,6 +876,31 @@ test('buildUserDocUpdate sets inside arrays via @getById by rewriting the parent
   assert.deepEqual(update.items, [
     { id: '1', name: 'a' },
     { id: '2', name: 'B' },
+  ]);
+});
+
+test('buildUserDocUpdate preserves dotted keys when setting inside arrays via @getById', () => {
+  const { buildUserDocUpdate } = modifyDataAdapter;
+  const userData = {
+    items: [
+      { id: '1', 'a.b': 1 },
+      { id: '2', 'a.b': 2 },
+    ],
+  };
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: { property: '/items/@getById:2/a.b', func: 'set', value: 99 },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.deepEqual(Object.keys(update), ['items']);
+  assert.deepEqual(update.items, [
+    { id: '1', 'a.b': 1 },
+    { id: '2', 'a.b': 99 },
   ]);
 });
 

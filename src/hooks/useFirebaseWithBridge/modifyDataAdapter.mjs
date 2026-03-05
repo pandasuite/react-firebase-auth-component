@@ -12,6 +12,8 @@ import {
 } from './collectionStorageAdapter.mjs';
 import { buildPointerPlan } from './pointerPlanner.mjs';
 
+export const REPLACE_DOCUMENT_UPDATE = Symbol('replaceDocumentUpdate');
+
 const rawPandaValue = (value) => {
   if (value && typeof value === 'object' && typeof value.type === 'string') {
     return value.value;
@@ -100,9 +102,14 @@ const getOutputValueAtPath = ({
   originalUserData,
   logicalUserData,
   basePath,
+  baseSegments,
 }) => {
-  const originalValue = _.get(originalUserData, basePath);
-  const logicalValue = _.get(logicalUserData, basePath);
+  const path =
+    Array.isArray(baseSegments) && baseSegments.length > 0
+      ? baseSegments
+      : basePath;
+  const originalValue = _.get(originalUserData, path);
+  const logicalValue = _.get(logicalUserData, path);
 
   return toOutputValueDeep({ originalValue, logicalValue });
 };
@@ -214,7 +221,10 @@ const getPointerObjects = ({ JSONPointer, property }) => {
 const toPathSegments = (pointerObjects) =>
   pointerObjects
     .map((ptr) => {
-      if (ptr.func === 'getKey' && typeof ptr.value === 'string') {
+      if (
+        (ptr.func === 'getKey' || ptr.func === 'getByKey') &&
+        typeof ptr.value === 'string'
+      ) {
         return ptr.value;
       }
       if (ptr.func === 'getByIndex' && /^\d+$/.test(String(ptr.value))) {
@@ -224,11 +234,11 @@ const toPathSegments = (pointerObjects) =>
     })
     .filter((segment) => segment !== null && segment !== undefined);
 
-const getStableParentPath = (pointerObjects, endIndex) => {
+const getStableParentSegments = (pointerObjects, endIndex) => {
   const stableSegments = [];
 
   for (const ptr of pointerObjects.slice(0, endIndex)) {
-    if (ptr?.func !== 'getKey') {
+    if (ptr?.func !== 'getKey' && ptr?.func !== 'getByKey') {
       break;
     }
 
@@ -237,7 +247,7 @@ const getStableParentPath = (pointerObjects, endIndex) => {
     }
   }
 
-  return stableSegments.join('.');
+  return stableSegments;
 };
 
 const applyModifyInPlaceSafely = ({
@@ -312,12 +322,45 @@ export const resolvePointerSegments = ({
 const getDocumentFromPointer = (userData, pointer, value) => {
   const update = {};
   const index = _.findIndex(pointer, (key) => _.isNumber(key));
+  const firstUnaddressableSegmentIndex = _.findIndex(
+    pointer,
+    (segment) => typeof segment === 'string' && segment.includes('.'),
+  );
+  if (
+    firstUnaddressableSegmentIndex >= 0 &&
+    (index === -1 || index > firstUnaddressableSegmentIndex)
+  ) {
+    if (firstUnaddressableSegmentIndex === 0) {
+      const nextDocument =
+        userData && typeof userData === 'object'
+          ? _.cloneDeep(userData)
+          : Object.create(null);
+      _.set(nextDocument, pointer, value);
+      return { [REPLACE_DOCUMENT_UPDATE]: nextDocument };
+    }
+
+    const parentPath = pointer
+      .slice(0, firstUnaddressableSegmentIndex)
+      .join('.');
+    const tailPath = pointer.slice(firstUnaddressableSegmentIndex);
+    const subtree = _.get(userData, parentPath);
+    const patchableSubtree =
+      subtree && typeof subtree === 'object'
+        ? _.cloneDeep(subtree)
+        : typeof tailPath[0] === 'number'
+          ? []
+          : Object.create(null);
+
+    _.set(patchableSubtree, tailPath, value);
+    update[parentPath] = patchableSubtree;
+    return update;
+  }
 
   if (index !== -1) {
     const path = pointer.slice(0, index).join('.');
     const subtree = _.get(userData, path);
     update[path] = _.cloneDeep(subtree);
-    _.set(update[path], pointer.slice(index).join('.'), value);
+    _.set(update[path], pointer.slice(index), value);
   } else {
     update[pointer.join('.')] = value;
   }
@@ -389,11 +432,11 @@ export const buildUserDocUpdate = ({
       return null;
     }
 
-    const basePath = getStableParentPath(
+    const baseSegments = getStableParentSegments(
       pointerObjects,
       firstComputedSelectorIndex,
     );
-    if (!basePath) {
+    if (!baseSegments || baseSegments.length === 0) {
       return null;
     }
 
@@ -408,13 +451,12 @@ export const buildUserDocUpdate = ({
       return null;
     }
 
-    return {
-      [basePath]: getOutputValueAtPath({
-        originalUserData: userData,
-        logicalUserData,
-        basePath,
-      }),
-    };
+    const outputValue = getOutputValueAtPath({
+      originalUserData: userData,
+      logicalUserData,
+      baseSegments,
+    });
+    return getDocumentFromPointer(userData, baseSegments, outputValue);
   }
 
   if (firstArraySelectorIndex !== -1 && func !== 'set') {
@@ -422,11 +464,11 @@ export const buildUserDocUpdate = ({
       return null;
     }
 
-    const basePath = getStableParentPath(
+    const baseSegments = getStableParentSegments(
       pointerObjects,
       firstArraySelectorIndex,
     );
-    if (!basePath) {
+    if (!baseSegments || baseSegments.length === 0) {
       return null;
     }
 
@@ -441,13 +483,12 @@ export const buildUserDocUpdate = ({
       return null;
     }
 
-    return {
-      [basePath]: getOutputValueAtPath({
-        originalUserData: userData,
-        logicalUserData,
-        basePath,
-      }),
-    };
+    const outputValue = getOutputValueAtPath({
+      originalUserData: userData,
+      logicalUserData,
+      baseSegments,
+    });
+    return getDocumentFromPointer(userData, baseSegments, outputValue);
   }
 
   const hasGetById = pointerObjects.some((ptr) => ptr?.func === 'getById');

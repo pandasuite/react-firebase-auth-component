@@ -13,7 +13,10 @@ import { JSONPointer, ModifyData } from '@beingenious/jsonpointer';
 import { initializeFirebase } from './firebaseConfig';
 import { generateAuthTokenAction } from './generateAuthTokenAction.mjs';
 import { normalizeCollectionsForStorage } from './collectionStorageAdapter.mjs';
-import { buildUserDocUpdate } from './modifyDataAdapter.mjs';
+import {
+  buildUserDocUpdate,
+  REPLACE_DOCUMENT_UPDATE,
+} from './modifyDataAdapter.mjs';
 import { createChangeActionController } from './changeActionController.mjs';
 
 let firestore = null;
@@ -39,7 +42,16 @@ const changeData = ({ user, modify }) => {
             language: navigator.language.replace('-', '_'),
           });
           if (update) {
-            transaction.update(userDocRef, update);
+            if (
+              Object.prototype.hasOwnProperty.call(
+                update,
+                REPLACE_DOCUMENT_UPDATE,
+              )
+            ) {
+              transaction.set(userDocRef, update[REPLACE_DOCUMENT_UPDATE]);
+            } else {
+              transaction.update(userDocRef, update);
+            }
           }
         }
       }),

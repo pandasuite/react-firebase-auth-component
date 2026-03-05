@@ -29,6 +29,7 @@
     "start": "vite",
     "start:auth": "vite --open /auth.html",
     "start:session": "vite --open /session.html",
+    "test": "node --test tests/*.test.mjs",
     "build:auth": "cross-env VITE_APP_TARGET=auth vite build --outDir build-auth --emptyOutDir",
     "build:session": "cross-env VITE_APP_TARGET=session vite build --outDir build-session --emptyOutDir && mv build-session/session.html build-session/index.html",
     "package:auth": "cp src/json/auth/pandasuite.json build-auth/pandasuite.json && cd build-auth && zip -r -X ../pandasuite-auth-component.zip *",
