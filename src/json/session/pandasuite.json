@@ -1,11 +1,17 @@
 {
+  "meta": {
+    "stype": "firebase-session",
+    "componentURL": "https://github.com/pandasuite/react-firebase-auth-component/tree/session",
+    "description": "Manages Firebase user sessions with sign-in, sign-out, token generation, and user data access. Exposes user name and email as queryable data.",
+    "locale_description": {
+      "fr_FR": "Gère les sessions utilisateur Firebase avec connexion, déconnexion, génération de tokens et accès aux données utilisateur. Expose le nom et l'email de l'utilisateur comme données interrogeables."
+    }
+  },
   "version": "2.0.0",
   "main": "",
-
   "system": {
     "localization": true
   },
-
   "properties": [
     {
       "id": "apiKey",
@@ -14,7 +20,11 @@
         "fr_FR": "Clé API"
       },
       "type": "String",
-      "required": true
+      "required": true,
+      "description": "Firebase project API key for authentication.",
+      "locale_description": {
+        "fr_FR": "Clé API du projet Firebase pour l'authentification."
+      }
     },
     {
       "id": "projectId",
@@ -23,7 +33,11 @@
         "fr_FR": "ID de projet"
       },
       "type": "String",
-      "required": true
+      "required": true,
+      "description": "Firebase project identifier.",
+      "locale_description": {
+        "fr_FR": "Identifiant du projet Firebase."
+      }
     },
     {
       "id": "verifyEmail",
@@ -32,7 +46,11 @@
         "fr_FR": "Forcer la vérification d'email"
       },
       "type": "Boolean",
-      "value": false
+      "value": false,
+      "description": "Require email verification before allowing sign-in.",
+      "locale_description": {
+        "fr_FR": "Exiger la vérification de l'email avant d'autoriser la connexion."
+      }
     },
     {
       "id": "forceAuthenticationAfter",
@@ -41,7 +59,11 @@
         "fr_FR": "Forcer l'authentification après (heures)"
       },
       "type": "Integer",
-      "value": 0
+      "value": 0,
+      "description": "Force re-authentication after this many minutes of inactivity (0 to disable).",
+      "locale_description": {
+        "fr_FR": "Forcer la ré-authentification après ce nombre de minutes d'inactivité (0 pour désactiver)."
+      }
     },
     {
       "id": "defaultUserSchema",
@@ -51,16 +73,23 @@
       },
       "type": "JSON",
       "value": {},
-      "hidden": true
+      "hidden": true,
+      "description": "Default JSON schema for new user records in Firebase.",
+      "locale_description": {
+        "fr_FR": "Schéma JSON par défaut pour les nouveaux enregistrements utilisateur dans Firebase."
+      }
     }
   ],
-
   "events": [
     {
       "id": "onSignedIn",
       "name": "User Signed In",
       "locale_name": {
         "fr_FR": "Utilisateur connecté"
+      },
+      "description": "Fires when a user successfully signs in.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand un utilisateur se connecte avec succès."
       }
     },
     {
@@ -68,6 +97,10 @@
       "name": "User Signed Out",
       "locale_name": {
         "fr_FR": "Utilisateur Déconnecté"
+      },
+      "description": "Fires when the user signs out.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand l'utilisateur se déconnecte."
       }
     },
     {
@@ -82,6 +115,10 @@
           "name": "Code",
           "locale_name": {
             "fr_FR": "Code"
+          },
+          "description": "Firebase error code for the failed sign-in.",
+          "locale_description": {
+            "fr_FR": "Code d'erreur Firebase pour la connexion échouée."
           }
         },
         "message": "Firebase: Invalid assertion format. (auth/invalid-custom-token).",
@@ -89,8 +126,16 @@
           "name": "Message",
           "locale_name": {
             "fr_FR": "Message"
+          },
+          "description": "Human-readable error message for the failed sign-in.",
+          "locale_description": {
+            "fr_FR": "Message d'erreur lisible pour la connexion échouée."
           }
         }
+      },
+      "description": "Fires when a sign-in attempt fails.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand une tentative de connexion échoue."
       }
     },
     {
@@ -105,6 +150,10 @@
           "name": "Code",
           "locale_name": {
             "fr_FR": "Code"
+          },
+          "description": "Firebase error code for the failed registration.",
+          "locale_description": {
+            "fr_FR": "Code d'erreur Firebase pour l'inscription échouée."
           }
         },
         "message": "Firebase: The email address is badly formatted. (auth/invalid-email).",
@@ -112,8 +161,16 @@
           "name": "Message",
           "locale_name": {
             "fr_FR": "Message"
+          },
+          "description": "Human-readable error message for the failed registration.",
+          "locale_description": {
+            "fr_FR": "Message d'erreur lisible pour l'inscription échouée."
           }
         }
+      },
+      "description": "Fires when a registration attempt fails.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand une tentative d'inscription échoue."
       }
     },
     {
@@ -128,6 +185,10 @@
           "name": "Token",
           "locale_name": {
             "fr_FR": "Jeton"
+          },
+          "description": "Generated Firebase authentication token.",
+          "locale_description": {
+            "fr_FR": "Token d'authentification Firebase généré."
           }
         },
         "expiresAt": {
@@ -138,8 +199,16 @@
           "name": "Expires At",
           "locale_name": {
             "fr_FR": "Expire le"
+          },
+          "description": "Token expiration timestamp.",
+          "locale_description": {
+            "fr_FR": "Horodatage d'expiration du token."
           }
         }
+      },
+      "description": "Fires when a new authentication token is generated.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand un nouveau token d'authentification est généré."
       }
     },
     {
@@ -154,6 +223,10 @@
           "name": "Code",
           "locale_name": {
             "fr_FR": "Code"
+          },
+          "description": "Firebase error code for the failed data modification.",
+          "locale_description": {
+            "fr_FR": "Code d'erreur Firebase pour la modification de données échouée."
           }
         },
         "message": "",
@@ -161,12 +234,19 @@
           "name": "Message",
           "locale_name": {
             "fr_FR": "Message"
+          },
+          "description": "Human-readable error message for the failed modification.",
+          "locale_description": {
+            "fr_FR": "Message d'erreur lisible pour la modification échouée."
           }
         }
+      },
+      "description": "Fires when a user data modification fails.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand une modification des données utilisateur échoue."
       }
     }
   ],
-
   "actions": [
     {
       "id": "change",
@@ -177,9 +257,17 @@
       "params": [
         {
           "id": "modify",
-          "type": "ModifyData"
+          "type": "ModifyData",
+          "description": "Data modifications to apply to the user record.",
+          "locale_description": {
+            "fr_FR": "Modifications de données à appliquer à l'enregistrement utilisateur."
+          }
         }
-      ]
+      ],
+      "description": "Modify the current user's data in Firebase.",
+      "locale_description": {
+        "fr_FR": "Modifier les données de l'utilisateur actuel dans Firebase."
+      }
     },
     {
       "id": "signInWithCustomToken",
@@ -195,9 +283,17 @@
             "fr_FR": "Jeton"
           },
           "type": "String",
-          "bindable": true
+          "bindable": true,
+          "description": "Custom authentication token.",
+          "locale_description": {
+            "fr_FR": "Token d'authentification personnalisé."
+          }
         }
-      ]
+      ],
+      "description": "Sign in using a custom authentication token.",
+      "locale_description": {
+        "fr_FR": "Se connecter avec un token d'authentification personnalisé."
+      }
     },
     {
       "id": "signInWithEmailAndPassword",
@@ -213,7 +309,11 @@
             "fr_FR": "Email"
           },
           "type": "String",
-          "bindable": true
+          "bindable": true,
+          "description": "User email address for sign-in.",
+          "locale_description": {
+            "fr_FR": "Adresse email de l'utilisateur pour la connexion."
+          }
         },
         {
           "id": "password",
@@ -222,15 +322,27 @@
             "fr_FR": "Mot de passe"
           },
           "type": "String",
-          "bindable": true
+          "bindable": true,
+          "description": "User password for sign-in.",
+          "locale_description": {
+            "fr_FR": "Mot de passe de l'utilisateur pour la connexion."
+          }
         }
-      ]
+      ],
+      "description": "Sign in with email and password credentials.",
+      "locale_description": {
+        "fr_FR": "Se connecter avec des identifiants email et mot de passe."
+      }
     },
     {
       "id": "signOut",
       "name": "Sign Out",
       "locale_name": {
         "fr_FR": "Se déconnecter"
+      },
+      "description": "Sign out the current user and end the session.",
+      "locale_description": {
+        "fr_FR": "Déconnecter l'utilisateur actuel et terminer la session."
       }
     },
     {
@@ -247,7 +359,11 @@
             "fr_FR": "Email"
           },
           "type": "String",
-          "bindable": true
+          "bindable": true,
+          "description": "Email address for the new account.",
+          "locale_description": {
+            "fr_FR": "Adresse email pour le nouveau compte."
+          }
         },
         {
           "id": "password",
@@ -256,7 +372,11 @@
             "fr_FR": "Mot de passe"
           },
           "type": "String",
-          "bindable": true
+          "bindable": true,
+          "description": "Password for the new account.",
+          "locale_description": {
+            "fr_FR": "Mot de passe pour le nouveau compte."
+          }
         },
         {
           "id": "traits",
@@ -265,9 +385,17 @@
             "fr_FR": "Caractéristiques"
           },
           "type": "Hash",
-          "bindable": true
+          "bindable": true,
+          "description": "Additional user properties to store with the new account.",
+          "locale_description": {
+            "fr_FR": "Propriétés utilisateur supplémentaires à stocker avec le nouveau compte."
+          }
         }
-      ]
+      ],
+      "description": "Create a new user account with email and password.",
+      "locale_description": {
+        "fr_FR": "Créer un nouveau compte utilisateur avec email et mot de passe."
+      }
     },
     {
       "id": "generateAuthToken",
@@ -284,18 +412,29 @@
           },
           "type": "Boolean",
           "value": true,
-          "bindable": true
+          "bindable": true,
+          "description": "Force token refresh even if the current token is still valid.",
+          "locale_description": {
+            "fr_FR": "Forcer le rafraîchissement du token même si le token actuel est encore valide."
+          }
         }
-      ]
+      ],
+      "description": "Generate a Firebase authentication token for the current user.",
+      "locale_description": {
+        "fr_FR": "Générer un token d'authentification Firebase pour l'utilisateur actuel."
+      }
     }
   ],
-
   "queryable": {
     "name": "",
     "__desc_name": {
       "name": "Name",
       "locale_name": {
         "fr_FR": "Nom"
+      },
+      "description": "Current signed-in user's display name.",
+      "locale_description": {
+        "fr_FR": "Nom d'affichage de l'utilisateur actuellement connecté."
       }
     },
     "email": "",
@@ -303,6 +442,10 @@
       "name": "Email",
       "locale_name": {
         "fr_FR": "Email"
+      },
+      "description": "Current signed-in user's email address.",
+      "locale_description": {
+        "fr_FR": "Adresse email de l'utilisateur actuellement connecté."
       }
     }
   }

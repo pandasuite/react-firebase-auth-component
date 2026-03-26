@@ -1,11 +1,17 @@
 {
+  "meta": {
+    "stype": "authentication",
+    "componentURL": "https://github.com/pandasuite/react-firebase-auth-component/",
+    "description": "Ready-to-use sign-up and login form UI powered by Firebase. Supports email/password, email verification, terms acceptance, and custom registration fields.",
+    "locale_description": {
+      "fr_FR": "Interface de formulaire d'inscription et de connexion prête à l'emploi propulsée par Firebase. Supporte email/mot de passe, vérification d'email, acceptation des conditions et champs d'inscription personnalisés."
+    }
+  },
   "version": "2.0.0",
   "main": "",
-
   "system": {
     "localization": true
   },
-
   "properties": [
     {
       "id": "session",
@@ -20,7 +26,11 @@
         ],
         "number": 1
       },
-      "required": true
+      "required": true,
+      "description": "Firebase Session component to connect to for user management.",
+      "locale_description": {
+        "fr_FR": "Composant Firebase Session auquel se connecter pour la gestion des utilisateurs."
+      }
     },
     {
       "id": "advancedFields",
@@ -29,7 +39,11 @@
         "fr_FR": "Champs utilisateurs avancés"
       },
       "type": "Boolean",
-      "value": false
+      "value": false,
+      "description": "Enable advanced registration fields beyond email and password.",
+      "locale_description": {
+        "fr_FR": "Activer des champs d'inscription avancés au-delà de l'email et du mot de passe."
+      }
     },
     {
       "id": "fields",
@@ -90,7 +104,11 @@
           "required": false
         }
       ],
-      "hidden": "properties.advancedFields.value != true"
+      "hidden": "properties.advancedFields.value != true",
+      "description": "JSON configuration of custom registration form fields. Active when advanced fields is enabled.",
+      "locale_description": {
+        "fr_FR": "Configuration JSON des champs personnalisés du formulaire d'inscription. Actif quand les champs avancés sont activés."
+      }
     },
     {
       "id": "terms",
@@ -99,7 +117,11 @@
         "fr_FR": "Communications et conditions d'utilisation"
       },
       "type": "Boolean",
-      "value": false
+      "value": false,
+      "description": "Show a terms and conditions checkbox on the registration form.",
+      "locale_description": {
+        "fr_FR": "Afficher une case à cocher de conditions d'utilisation sur le formulaire d'inscription."
+      }
     },
     {
       "id": "registration",
@@ -108,7 +130,11 @@
         "fr_FR": "Autoriser l'inscription"
       },
       "type": "Boolean",
-      "value": true
+      "value": true,
+      "description": "Enable the user registration form alongside the login form.",
+      "locale_description": {
+        "fr_FR": "Activer le formulaire d'inscription utilisateur à côté du formulaire de connexion."
+      }
     },
     {
       "id": "styles",
@@ -124,16 +150,23 @@
         }
       },
       "bindable": true,
-      "value": ""
+      "value": "",
+      "description": "Custom CSS styles for the authentication form.",
+      "locale_description": {
+        "fr_FR": "Styles CSS personnalisés pour le formulaire d'authentification."
+      }
     }
   ],
-
   "events": [
     {
       "id": "onTermsClicked",
       "name": "Terms Clicked",
       "locale_name": {
         "fr_FR": "Conditions Cliquées"
+      },
+      "description": "Fires when the user clicks the terms and conditions link.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand l'utilisateur clique sur le lien des conditions d'utilisation."
       }
     },
     {
@@ -141,6 +174,10 @@
       "name": "Email Verified",
       "locale_name": {
         "fr_FR": "Email Vérifié"
+      },
+      "description": "Fires when the user's email address has been verified.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand l'adresse email de l'utilisateur a été vérifiée."
       }
     }
   ]
