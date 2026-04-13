@@ -139,6 +139,52 @@
       }
     },
     {
+      "id": "onEmailLinkRequested",
+      "name": "Email Link Requested",
+      "locale_name": {
+        "fr_FR": "Lien email demandé"
+      },
+      "description": "Fires when a passwordless email sign-in link has been requested successfully.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand un lien de connexion sans mot de passe a été demandé avec succès."
+      }
+    },
+    {
+      "id": "onEmailLinkRequestError",
+      "name": "Email Link Request Error",
+      "locale_name": {
+        "fr_FR": "Erreur de demande de lien email"
+      },
+      "queryable": {
+        "code": "auth/invalid-email",
+        "__desc_code": {
+          "name": "Code",
+          "locale_name": {
+            "fr_FR": "Code"
+          },
+          "description": "Firebase error code for the failed email-link request.",
+          "locale_description": {
+            "fr_FR": "Code d'erreur Firebase pour la demande de lien email échouée."
+          }
+        },
+        "message": "Unable to request an email-link sign-in.",
+        "__desc_message": {
+          "name": "Message",
+          "locale_name": {
+            "fr_FR": "Message"
+          },
+          "description": "Sanitized error message for the failed email-link request.",
+          "locale_description": {
+            "fr_FR": "Message d'erreur normalisé pour la demande de lien email échouée."
+          }
+        }
+      },
+      "description": "Fires when requesting a passwordless email sign-in link fails.",
+      "locale_description": {
+        "fr_FR": "Se déclenche quand la demande d'un lien de connexion sans mot de passe échoue."
+      }
+    },
+    {
       "id": "onRegisterError",
       "name": "Register Error",
       "locale_name": {
@@ -332,6 +378,84 @@
       "description": "Sign in with email and password credentials.",
       "locale_description": {
         "fr_FR": "Se connecter avec des identifiants email et mot de passe."
+      }
+    },
+    {
+      "id": "requestEmailLinkSignIn",
+      "name": "Request Email Link Sign In",
+      "locale_name": {
+        "fr_FR": "Demander une connexion par lien email"
+      },
+      "params": [
+        {
+          "id": "email",
+          "name": "Email",
+          "locale_name": {
+            "fr_FR": "Email"
+          },
+          "type": "String",
+          "bindable": true,
+          "description": "User email address that should receive the sign-in link.",
+          "locale_description": {
+            "fr_FR": "Adresse email de l'utilisateur qui doit recevoir le lien de connexion."
+          }
+        },
+        {
+          "id": "continueUrl",
+          "name": "Continue URL",
+          "locale_name": {
+            "fr_FR": "URL de continuation"
+          },
+          "type": "String",
+          "bindable": true,
+          "description": "Authorized callback URL that Firebase should embed in the email link.",
+          "locale_description": {
+            "fr_FR": "URL de callback autorisée que Firebase doit embarquer dans le lien email."
+          }
+        }
+      ],
+      "description": "Request a passwordless Firebase email sign-in link.",
+      "locale_description": {
+        "fr_FR": "Demander un lien de connexion Firebase sans mot de passe par email."
+      }
+    },
+    {
+      "id": "completeEmailLinkSignIn",
+      "name": "Complete Email Link Sign In",
+      "locale_name": {
+        "fr_FR": "Finaliser la connexion par lien email"
+      },
+      "params": [
+        {
+          "id": "email",
+          "name": "Email",
+          "locale_name": {
+            "fr_FR": "Email"
+          },
+          "type": "String",
+          "bindable": true,
+          "description": "Email address used to complete the Firebase email-link sign-in.",
+          "locale_description": {
+            "fr_FR": "Adresse email utilisée pour finaliser la connexion Firebase par lien email."
+          }
+        },
+        {
+          "id": "emailLink",
+          "name": "Email Link",
+          "locale_name": {
+            "fr_FR": "Lien email"
+          },
+          "type": "String",
+          "bindable": true,
+          "description": "Full Firebase callback URL received from the email link.",
+          "locale_description": {
+            "fr_FR": "URL complète de callback Firebase reçue depuis le lien email."
+          }
+        }
+      ],
+      "description": "Complete a passwordless Firebase email sign-in from the full callback URL.",
+      "locale_description": {
+        "fr_FR": "Finaliser une connexion Firebase sans mot de passe à partir de l'URL complète du callback."
       }
     },
     {

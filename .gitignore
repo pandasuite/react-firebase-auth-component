@@ -28,3 +28,5 @@ yarn-error.log*
 /pandasuite-session-component.zip
 /pandasuite-auth-component.zip
 /public/pandasuite.json
+.omx/
+.omc/

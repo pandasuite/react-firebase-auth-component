@@ -3,6 +3,9 @@ import reactRefresh from '@vitejs/plugin-react-refresh';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { ensureStructuredClone } from './viteStructuredCloneFallback.mjs';
+
+ensureStructuredClone();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -19,7 +22,11 @@ function pandaSuiteManifestPlugin() {
         const referer = req.headers.referer || '';
         const variant = referer.includes('session.html') ? 'session' : 'auth';
         const manifestPath = path.resolve(
-          __dirname, 'src', 'json', variant, 'pandasuite.json',
+          __dirname,
+          'src',
+          'json',
+          variant,
+          'pandasuite.json',
         );
         res.setHeader('Content-Type', 'application/json');
         const stream = fs.createReadStream(manifestPath);
@@ -34,7 +41,8 @@ function pandaSuiteManifestPlugin() {
 }
 
 function buildInput() {
-  if (target === 'session') return { session: path.resolve(__dirname, 'session.html') };
+  if (target === 'session')
+    return { session: path.resolve(__dirname, 'session.html') };
   return { main: path.resolve(__dirname, 'index.html') };
 }
 

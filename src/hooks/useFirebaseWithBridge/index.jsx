@@ -12,6 +12,10 @@ import { useMemo, useEffect, useCallback } from 'react';
 import { JSONPointer, ModifyData } from '@beingenious/jsonpointer';
 import { initializeFirebase } from './firebaseConfig';
 import { generateAuthTokenAction } from './generateAuthTokenAction.mjs';
+import {
+  completeEmailLinkSignInAction,
+  requestEmailLinkSignInAction,
+} from './emailLinkSignInActions.mjs';
 import { normalizeCollectionsForStorage } from './collectionStorageAdapter.mjs';
 import {
   buildUserDocUpdate,
@@ -113,6 +117,24 @@ function useFirebaseWithBridge() {
             ]);
           });
         }
+      },
+      requestEmailLinkSignIn: ({ email, continueUrl }) => {
+        requestEmailLinkSignInAction({
+          auth,
+          email,
+          continueUrl,
+          send: PandaBridge.send.bind(PandaBridge),
+        });
+      },
+      completeEmailLinkSignIn: ({ email, emailLink }) => {
+        completeEmailLinkSignInAction({
+          auth,
+          firestore,
+          email,
+          emailLink,
+          defaultUserSchema: getDefaultUserSchema(),
+          send: PandaBridge.send.bind(PandaBridge),
+        });
       },
       generateAuthToken: ({ forceRefresh }) => {
         generateAuthTokenAction({
