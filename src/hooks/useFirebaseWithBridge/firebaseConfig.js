@@ -48,7 +48,10 @@ const initializeFirebase = (config) => {
         console.log('Firestore persistence enabled');
       })
       .catch((error) => {
-        console.error('Error enabling Firestore persistence:', error);
+        console.warn(
+          'Firestore persistence unavailable; continuing with in-memory cache. Optimistic writes will not survive a reload.',
+          error,
+        );
       });
   } catch (error) {
     console.error('Error initializing Firebase:', error);

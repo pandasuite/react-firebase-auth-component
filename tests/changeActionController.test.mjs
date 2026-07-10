@@ -57,6 +57,64 @@ test('controller queues during auth bootstrap and flushes when auth becomes read
   assert.equal(errors.length, 0);
 });
 
+test('controller waits for observer-synchronized auth before flushing changes', () => {
+  const applied = [];
+  const errors = [];
+  const scheduler = createFakeScheduler();
+  const controller = createChangeActionController({
+    applyChange: ({ user, modify }) => {
+      applied.push({ user, modify });
+    },
+    sendChangeError: (code, message) => {
+      errors.push({ code, message });
+    },
+    schedule: scheduler.schedule,
+    clearScheduled: scheduler.clearScheduled,
+  });
+
+  controller.handleIncomingChange({
+    auth: null,
+    payload: { property: '/queued', func: 'set', value: 1 },
+  });
+
+  const user = { uid: 'u1' };
+  const auth = { currentUser: user };
+  controller.handleIncomingChange({
+    auth,
+    payload: { property: '/during-sign-in', func: 'set', value: 2 },
+  });
+
+  assert.deepEqual(applied, []);
+
+  controller.syncAuth(auth);
+
+  assert.deepEqual(
+    applied.map(({ modify }) => modify.property),
+    ['/queued', '/during-sign-in'],
+  );
+  assert.deepEqual(errors, []);
+});
+
+test('controller discards a queued change when auth synchronizes a different user', () => {
+  const applied = [];
+  const controller = createChangeActionController({
+    applyChange: ({ user, modify }) => {
+      applied.push({ user, modify });
+    },
+    sendChangeError: () => {},
+  });
+
+  controller.handleIncomingChange({
+    auth: { currentUser: { uid: 'user-a' } },
+    payload: { property: '/profile/name', func: 'set', value: 'Alice' },
+  });
+
+  controller.syncAuth({ currentUser: { uid: 'user-b' } });
+  controller.syncAuth({ currentUser: { uid: 'user-a' } });
+
+  assert.deepEqual(applied, []);
+});
+
 test('controller keeps pending changes across transient signed-out and flushes when ready', () => {
   const applied = [];
   const errors = [];

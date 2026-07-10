@@ -30,3 +30,6 @@ yarn-error.log*
 /public/pandasuite.json
 .omx/
 .omc/
+# Firebase emulator artifacts
+firestore-debug.log
+firebase-debug.log

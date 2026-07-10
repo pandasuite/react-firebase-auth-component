@@ -15,6 +15,25 @@ const FieldValue = {
 const encodeIdKey = (id) =>
   `k_${Buffer.from(String(id), 'utf8').toString('base64url')}`;
 
+const buildCanonicalRowUpdate = ({ row, modify }) => {
+  const rowKey = encodeIdKey('1');
+  const result = modifyDataAdapter.buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      items: {
+        type: 'Collection',
+        order: ['1'],
+        valueById: { [rowKey]: { id: '1', ...row } },
+      },
+    },
+    modify,
+    FieldValue,
+    language: 'en_US',
+  });
+  return { result, rowKey };
+};
+
 test('buildUserDocUpdate uses FieldValue.increment on simple paths', () => {
   const { buildUserDocUpdate } = modifyDataAdapter;
   const userData = { count: 1 };
@@ -100,8 +119,8 @@ test('buildUserDocUpdate keeps numeric @getByKey values as map keys', () => {
   });
 });
 
-test('buildUserDocUpdate rewrites parent map for @getByKey keys containing dots', () => {
-  const { buildUserDocUpdate } = modifyDataAdapter;
+test('buildUserDocUpdate emits a structured field path for nested dotted keys', () => {
+  const { buildUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
   const userData = {
     Points: {
       'Thu.03': { score: 1 },
@@ -122,16 +141,17 @@ test('buildUserDocUpdate rewrites parent map for @getByKey keys containing dots'
     language: 'en_US',
   });
 
-  assert.deepEqual(Object.keys(update), ['Points']);
-  assert.deepEqual(update.Points['Thu.03'].score, {
-    __op: 'increment',
-    n: 1,
-  });
-  assert.deepEqual(update.Points.Safe, { score: 9 });
+  assert.deepEqual(Object.keys(update), []);
+  assert.deepEqual(update[FIELD_PATH_UPDATES], [
+    {
+      segments: ['Points', 'Thu.03', 'score'],
+      value: { __op: 'increment', n: 1 },
+    },
+  ]);
 });
 
-test('buildUserDocUpdate rewrites whole document for root @getByKey keys containing dots', () => {
-  const { buildUserDocUpdate, REPLACE_DOCUMENT_UPDATE } = modifyDataAdapter;
+test('buildUserDocUpdate emits a structured field path for root dotted keys', () => {
+  const { buildUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
   const userData = {
     'Thu.03': { score: 1 },
     Safe: { score: 9 },
@@ -151,19 +171,16 @@ test('buildUserDocUpdate rewrites whole document for root @getByKey keys contain
   });
 
   assert.deepEqual(Object.keys(update), []);
-  assert.equal(
-    Object.prototype.hasOwnProperty.call(update, REPLACE_DOCUMENT_UPDATE),
-    true,
-  );
-  assert.deepEqual(update[REPLACE_DOCUMENT_UPDATE]['Thu.03'].score, {
-    __op: 'increment',
-    n: 1,
-  });
-  assert.deepEqual(update[REPLACE_DOCUMENT_UPDATE].Safe, { score: 9 });
+  assert.deepEqual(update[FIELD_PATH_UPDATES], [
+    {
+      segments: ['Thu.03', 'score'],
+      value: { __op: 'increment', n: 1 },
+    },
+  ]);
 });
 
 test('buildUserDocUpdate does not collide replacement sentinel with user field names', () => {
-  const { buildUserDocUpdate, REPLACE_DOCUMENT_UPDATE } = modifyDataAdapter;
+  const { buildUserDocUpdate } = modifyDataAdapter;
   const userData = {};
 
   const update = buildUserDocUpdate({
@@ -179,10 +196,6 @@ test('buildUserDocUpdate does not collide replacement sentinel with user field n
     language: 'en_US',
   });
 
-  assert.equal(
-    Object.prototype.hasOwnProperty.call(update, REPLACE_DOCUMENT_UPDATE),
-    false,
-  );
   assert.deepEqual(update, {
     __replaceDocument: { ok: true },
   });
@@ -224,8 +237,8 @@ test('buildUserDocUpdate scopes non-set @getByKey array updates to the keyed bra
   ]);
 });
 
-test('buildUserDocUpdate rewrites keyed parent for non-set @getByKey arrays when key has dots', () => {
-  const { buildUserDocUpdate } = modifyDataAdapter;
+test('buildUserDocUpdate emits a structured field path for dotted keyed array rewrites', () => {
+  const { buildUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
   const userData = {
     Points: {
       'Thu.03': {
@@ -250,10 +263,45 @@ test('buildUserDocUpdate rewrites keyed parent for non-set @getByKey arrays when
     language: 'en_US',
   });
 
-  assert.deepEqual(Object.keys(update), ['Points']);
-  assert.deepEqual(update.Points['Thu.03'].items, [
-    { id: '1', tags: ['a'] },
-    { id: '2', tags: ['b', 'c'] },
+  assert.deepEqual(Object.keys(update), []);
+  assert.deepEqual(update[FIELD_PATH_UPDATES], [
+    {
+      segments: ['Points', 'Thu.03', 'items'],
+      value: [
+        { id: '1', tags: ['a'] },
+        { id: '2', tags: ['b', 'c'] },
+      ],
+    },
+  ]);
+});
+
+test('buildUserDocUpdate rewrites arrays beneath dotted keys before submitting', () => {
+  const { buildUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
+  const userData = {
+    'Thu.03': {
+      items: [{ name: 'a' }, { name: 'b' }],
+    },
+  };
+
+  const update = buildUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: '/@getByKey:Thu.03/items/@getByIndex:1/name',
+      func: 'set',
+      value: 'B',
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.deepEqual(Object.keys(update), []);
+  assert.deepEqual(update[FIELD_PATH_UPDATES], [
+    {
+      segments: ['Thu.03', 'items'],
+      value: [{ name: 'a' }, { name: 'B' }],
+    },
   ]);
 });
 
@@ -473,7 +521,7 @@ test('buildUserDocUpdate delbyvalue on Collection wrapper migrates to canonical 
   assert.equal(update.items.value, undefined);
 });
 
-test('buildUserDocUpdate add on canonical Collection wrapper preserves order/valueById', () => {
+test('buildUserDocUpdate add on canonical Collection uses atomic membership', () => {
   const { buildUserDocUpdate } = modifyDataAdapter;
   const userData = {
     items: {
@@ -503,14 +551,17 @@ test('buildUserDocUpdate add on canonical Collection wrapper preserves order/val
     'items.order',
     `items.valueById.${encodeIdKey('2')}`,
   ]);
-  assert.deepEqual(update['items.order'], ['1', '2']);
+  assert.deepEqual(update['items.order'], {
+    __op: 'arrayUnion',
+    values: ['2'],
+  });
   assert.deepEqual(update[`items.valueById.${encodeIdKey('2')}`], {
     id: '2',
     name: 'b',
   });
 });
 
-test('buildUserDocUpdate add on canonical Collection with existing id falls back to rewrite', () => {
+test('buildUserDocUpdate add on canonical Collection with existing id merges one row', () => {
   const { buildUserDocUpdate } = modifyDataAdapter;
   const userData = {
     items: {
@@ -537,22 +588,22 @@ test('buildUserDocUpdate add on canonical Collection with existing id falls back
     language: 'en_US',
   });
 
-  assert.deepEqual(Object.keys(update), ['items']);
-  assert.equal(update.items.type, 'Collection');
-  assert.deepEqual(update.items.schema, { path: { value: '/cards' } });
-  assert.deepEqual(update.items.order, ['1', '2']);
-  assert.deepEqual(update.items.valueById[encodeIdKey('1')], {
-    id: '1',
-    name: 'a',
+  assert.deepEqual(Object.keys(update).sort(), [
+    'items.order',
+    `items.valueById.${encodeIdKey('2')}`,
+  ]);
+  assert.deepEqual(update['items.order'], {
+    __op: 'arrayUnion',
+    values: ['2'],
   });
-  assert.deepEqual(update.items.valueById[encodeIdKey('2')], {
+  assert.deepEqual(update[`items.valueById.${encodeIdKey('2')}`], {
     id: '2',
     name: 'b',
     score: 2,
   });
 });
 
-test('buildUserDocUpdate delbyid on canonical Collection wrapper preserves order/valueById', () => {
+test('buildUserDocUpdate delbyid on canonical Collection uses atomic membership and row delete', () => {
   const { buildUserDocUpdate } = modifyDataAdapter;
   const userData = {
     items: {
@@ -579,15 +630,17 @@ test('buildUserDocUpdate delbyid on canonical Collection wrapper preserves order
     language: 'en_US',
   });
 
-  assert.deepEqual(Object.keys(update), ['items']);
-  assert.equal(update.items.type, 'Collection');
-  assert.deepEqual(update.items.schema, { path: { value: '/cards' } });
-  assert.deepEqual(update.items.order, ['1']);
-  assert.deepEqual(update.items.valueById[encodeIdKey('1')], {
-    id: '1',
-    name: 'a',
+  assert.deepEqual(Object.keys(update).sort(), [
+    'items.order',
+    `items.valueById.${encodeIdKey('2')}`,
+  ]);
+  assert.deepEqual(update['items.order'], {
+    __op: 'arrayRemove',
+    values: ['2'],
   });
-  assert.equal(update.items.valueById[encodeIdKey('2')], undefined);
+  assert.deepEqual(update[`items.valueById.${encodeIdKey('2')}`], {
+    __op: 'delete',
+  });
 });
 
 test('buildUserDocUpdate migrates legacy Collection @getById set to canonical storage', () => {
@@ -1418,4 +1471,762 @@ test('buildUserDocUpdate returns null when @getById base array is missing', () =
   });
 
   assert.equal(update, null);
+});
+
+test('buildClassifiedUserDocUpdate emits FIELD_PATH_UPDATES for dotted literal keys', () => {
+  const { buildClassifiedUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
+  const userData = { profile: { 'a.b': 1, keep: true } };
+
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: [
+        { func: 'getKey', value: 'profile' },
+        { func: 'getKey', value: 'a.b' },
+      ],
+      func: 'set',
+      value: 2,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'targeted-write');
+  assert.deepEqual(result.update[FIELD_PATH_UPDATES], [
+    { segments: ['profile', 'a.b'], value: 2 },
+  ]);
+  // No parent clone: the dotted key must not force a rewrite of `profile`.
+  assert.equal(Object.keys(result.update).length, 0);
+});
+
+test('buildClassifiedUserDocUpdate uses structured paths for every Firestore path metacharacter', () => {
+  const { buildClassifiedUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
+
+  for (const key of ['a~b', 'a*b', 'a/b', 'a[b', 'a]b']) {
+    const result = buildClassifiedUserDocUpdate({
+      JSONPointer,
+      ModifyData,
+      userData: { profile: { [key]: 1 } },
+      modify: {
+        property: [
+          { func: 'getKey', value: 'profile' },
+          { func: 'getKey', value: key },
+        ],
+        func: 'set',
+        value: 2,
+      },
+      FieldValue,
+      language: 'en_US',
+    });
+
+    assert.equal(result.category, 'targeted-write');
+    assert.deepEqual(result.update[FIELD_PATH_UPDATES], [
+      { segments: ['profile', key], value: 2 },
+    ]);
+    assert.deepEqual(Object.keys(result.update), []);
+  }
+});
+
+test('buildClassifiedUserDocUpdate classifies transforms, targeted writes and rewrites', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+
+  const inc = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { count: 1 },
+    modify: { property: '/count', func: 'inc', value: 1 },
+    FieldValue,
+    language: 'en_US',
+  });
+  assert.equal(inc.category, 'atomic-transform');
+
+  const set = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { name: 'a' },
+    modify: { property: '/name', func: 'set', value: 'b' },
+    FieldValue,
+    language: 'en_US',
+  });
+  assert.equal(set.category, 'targeted-write');
+  assert.deepEqual(set.update, { name: 'b' });
+
+  const rewrite = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { rows: [{ id: '1', v: 1 }, { id: '2', v: 2 }] },
+    modify: {
+      property: '/rows/@find:id|eq|2/v',
+      func: 'set',
+      value: 9,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+  assert.equal(rewrite.category, 'local-rewrite');
+});
+
+test('canonical Collection selector transforms target valueById atomically', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const rowKey = encodeIdKey('1');
+  const userData = {
+    items: {
+      type: 'Collection',
+      order: ['1'],
+      valueById: {
+        [rowKey]: { id: '1', count: 0, tags: ['a'], obsolete: true },
+      },
+    },
+  };
+  const cases = [
+    {
+      modify: {
+        property: '/items/@getById:1/count',
+        func: 'inc',
+        value: 2,
+      },
+      field: 'count',
+      value: { __op: 'increment', n: 2 },
+    },
+    {
+      modify: {
+        property: '/items/@find:id|eq|1/obsolete',
+        func: 'del',
+      },
+      field: 'obsolete',
+      value: { __op: 'delete' },
+    },
+  ];
+
+  for (const entry of cases) {
+    const result = buildClassifiedUserDocUpdate({
+      JSONPointer,
+      ModifyData,
+      userData,
+      modify: entry.modify,
+      FieldValue,
+      language: 'en_US',
+    });
+
+    assert.equal(result.category, 'atomic-transform', entry.modify.property);
+    assert.deepEqual(result.update, {
+      [`items.valueById.${rowKey}.${entry.field}`]: entry.value,
+    });
+  }
+});
+
+test('add below a canonical Collection selector keeps ID-upsert semantics via local rewrite', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const rowKey = encodeIdKey('1');
+  const userData = {
+    items: {
+      type: 'Collection',
+      order: ['1'],
+      valueById: {
+        [rowKey]: { id: '1', children: [{ id: 'child', name: 'old' }] },
+      },
+    },
+  };
+
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData,
+    modify: {
+      property: '/items/@getById:1/children',
+      func: 'add',
+      value: { id: 'child', extra: 1 },
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  // arrayUnion would append a second { id: 'child' } row; ModifyData's add
+  // merges into the existing same-ID row, so this must stay a local rewrite.
+  assert.equal(result.category, 'local-rewrite');
+  assert.deepEqual(result.update.items.valueById[rowKey].children, [
+    { id: 'child', name: 'old', extra: 1 },
+  ]);
+});
+
+test('inc below a canonical selector falls back to ModifyData when the value is a wrapper', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const rowKey = encodeIdKey('1');
+
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      items: {
+        type: 'Collection',
+        order: ['1'],
+        valueById: {
+          [rowKey]: { id: '1', score: { type: 'Number', value: 5 } },
+        },
+      },
+    },
+    modify: { property: '/items/@getById:1/score', func: 'inc', value: 2 },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  // A Firestore increment on the stored map would clobber it with the
+  // operand (2); ModifyData must produce the incremented result instead.
+  assert.equal(result.category, 'local-rewrite');
+  assert.equal(result.update.items.valueById[rowKey].score, 7);
+});
+
+test('inc below a canonical selector rewrites non-finite stored numbers', () => {
+  for (const score of [NaN, Infinity]) {
+    const { result, rowKey } = buildCanonicalRowUpdate({
+      row: { score },
+      modify: { property: '/items/@getById:1/score', func: 'inc', value: 2 },
+    });
+
+    assert.equal(result.category, 'local-rewrite');
+    assert.equal(result.update.items.valueById[rowKey].score, 2);
+  }
+});
+
+test('inc below a canonical selector preserves parseFloat operand semantics', () => {
+  const { result, rowKey } = buildCanonicalRowUpdate({
+    row: { score: 1 },
+    modify: { property: '/items/@getById:1/score', func: 'inc', value: '2px' },
+  });
+
+  assert.equal(result.category, 'local-rewrite');
+  assert.equal(result.update.items.valueById[rowKey].score, 3);
+});
+
+test('del of a whole canonical row updates membership, not just valueById', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const rowKey = encodeIdKey('1');
+
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      items: {
+        type: 'Collection',
+        order: ['1', '2'],
+        valueById: {
+          [rowKey]: { id: '1', v: 1 },
+          [encodeIdKey('2')]: { id: '2', v: 2 },
+        },
+      },
+    },
+    modify: { property: '/items/@getById:1', func: 'del' },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  // Deleting only the valueById entry would leave a dangling '1' in order.
+  assert.equal(result.category, 'atomic-transform');
+  assert.deepEqual(result.update, {
+    'items.order': { __op: 'arrayRemove', values: ['1'] },
+    [`items.valueById.${rowKey}`]: { __op: 'delete' },
+  });
+});
+
+test('del below a canonical selector preserves typed field wrappers', () => {
+  const { result, rowKey } = buildCanonicalRowUpdate({
+    row: { title: { type: 'Text', value: 'hello' } },
+    modify: { property: '/items/@getById:1/title', func: 'del' },
+  });
+
+  assert.equal(result.category, 'local-rewrite');
+  assert.deepEqual(result.update.items.valueById[rowKey].title, {
+    type: 'Text',
+    value: null,
+  });
+});
+
+test('delbyid below a canonical selector ignores non-array targets', () => {
+  const { result } = buildCanonicalRowUpdate({
+    row: { map: { entry: { id: 'x' } } },
+    modify: { property: '/items/@getById:1/map', func: 'delbyid', value: 'x' },
+  });
+
+  assert.equal(result, null);
+});
+
+test('delbyid below a canonical selector rewrites loose ID matches', () => {
+  const { result, rowKey } = buildCanonicalRowUpdate({
+    row: { rows: [{ id: 2 }, { id: '2' }, { id: 'keep' }] },
+    modify: { property: '/items/@getById:1/rows', func: 'delbyid', value: '2' },
+  });
+
+  assert.equal(result.category, 'local-rewrite');
+  assert.deepEqual(result.update.items.valueById[rowKey].rows, [
+    { id: 'keep' },
+  ]);
+});
+
+test('delbyvalue below a canonical selector requires an actual array target', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const rowKey = encodeIdKey('1');
+
+  // Firestore arrayRemove would replace the stored map with []; ModifyData
+  // treats delbyvalue on a non-array as a no-op, so the plan must be null.
+  const onMap = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      items: {
+        type: 'Collection',
+        order: ['1'],
+        valueById: { [rowKey]: { id: '1', map: { keep: true } } },
+      },
+    },
+    modify: { property: '/items/@getById:1/map', func: 'delbyvalue', value: 'x' },
+    FieldValue,
+    language: 'en_US',
+  });
+  assert.equal(onMap, null);
+
+  // A real array keeps the atomic fast path.
+  const onArray = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      items: {
+        type: 'Collection',
+        order: ['1'],
+        valueById: { [rowKey]: { id: '1', tags: ['a', 'b'] } },
+      },
+    },
+    modify: { property: '/items/@getById:1/tags', func: 'delbyvalue', value: 'a' },
+    FieldValue,
+    language: 'en_US',
+  });
+  assert.equal(onArray.category, 'atomic-transform');
+  assert.deepEqual(onArray.update, {
+    [`items.valueById.${rowKey}.tags`]: { __op: 'arrayRemove', values: ['a'] },
+  });
+});
+
+test('delbyvalue below a canonical selector rewrites wrapped array values', () => {
+  const { result, rowKey } = buildCanonicalRowUpdate({
+    row: { tags: [{ type: 'Text', value: 'x' }] },
+    modify: {
+      property: '/items/@getById:1/tags',
+      func: 'delbyvalue',
+      value: 'x',
+    },
+  });
+
+  assert.equal(result.category, 'local-rewrite');
+  assert.deepEqual(result.update.items.valueById[rowKey].tags, []);
+});
+
+test('membership transforms target the exact stored order value for unnormalized IDs', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const rowKey = encodeIdKey('1');
+
+  // Upsert over a numerically-stored ID: arrayUnion('1') would produce
+  // [1, '1']; the transform must reuse the stored numeric value.
+  const upsert = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      items: { type: 'Collection', order: [1], valueById: { [rowKey]: { id: '1', v: 1 } } },
+    },
+    modify: { property: '/items', func: 'add', value: { id: '1', v: 5 } },
+    FieldValue,
+    language: 'en_US',
+  });
+  assert.deepEqual(upsert.update['items.order'], {
+    __op: 'arrayUnion',
+    values: [1],
+  });
+
+  // Same for removal: arrayRemove('2') would leave the numeric 2 behind.
+  const removal = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      items: {
+        type: 'Collection',
+        order: [1, 2],
+        valueById: {
+          [rowKey]: { id: '1', v: 1 },
+          [encodeIdKey('2')]: { id: '2', v: 2 },
+        },
+      },
+    },
+    modify: { property: '/items', func: 'delbyid', value: '2' },
+    FieldValue,
+    language: 'en_US',
+  });
+  assert.deepEqual(removal.update['items.order'], {
+    __op: 'arrayRemove',
+    values: [2],
+  });
+});
+
+test('canonical Collection add uses arrayUnion membership plus one row write', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const collection = {
+    type: 'Collection',
+    order: ['1'],
+    valueById: { [encodeIdKey('1')]: { id: '1', v: 1 } },
+  };
+
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { items: collection },
+    modify: {
+      property: '/items',
+      func: 'add',
+      value: { id: '2', v: 2 },
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'atomic-transform');
+  assert.deepEqual(result.update, {
+    'items.order': { __op: 'arrayUnion', values: ['2'] },
+    [`items.valueById.${encodeIdKey('2')}`]: { id: '2', v: 2 },
+  });
+});
+
+test('canonical Collection add of an existing ID stays a membership no-op plus row merge', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const collection = {
+    type: 'Collection',
+    order: ['1'],
+    valueById: { [encodeIdKey('1')]: { id: '1', v: 1 } },
+  };
+
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { items: collection },
+    modify: {
+      property: '/items',
+      func: 'add',
+      value: { id: '1', v: 5 },
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'atomic-transform');
+  assert.equal(
+    result.update['items.order'].__op,
+    'arrayUnion',
+    'membership must stay an arrayUnion no-op, never a literal order rewrite',
+  );
+  assert.deepEqual(
+    result.update[`items.valueById.${encodeIdKey('1')}`],
+    { id: '1', v: 5 },
+  );
+});
+
+test('canonical Collection add of an identical existing row stays atomic', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const row = { id: '1', v: 1 };
+  const collection = {
+    type: 'Collection',
+    order: ['1'],
+    valueById: { [encodeIdKey('1')]: row },
+  };
+
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { items: collection },
+    modify: { property: '/items', func: 'add', value: row },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'atomic-transform');
+  assert.deepEqual(result.update, {
+    'items.order': { __op: 'arrayUnion', values: ['1'] },
+    [`items.valueById.${encodeIdKey('1')}`]: row,
+  });
+});
+
+test('canonical Collection delbyid uses arrayRemove membership plus row delete', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const collection = {
+    type: 'Collection',
+    order: ['1', '2'],
+    valueById: {
+      [encodeIdKey('1')]: { id: '1', v: 1 },
+      [encodeIdKey('2')]: { id: '2', v: 2 },
+    },
+  };
+
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { items: collection },
+    modify: { property: '/items', func: 'delbyid', value: '2' },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'atomic-transform');
+  assert.deepEqual(result.update, {
+    'items.order': { __op: 'arrayRemove', values: ['2'] },
+    [`items.valueById.${encodeIdKey('2')}`]: { __op: 'delete' },
+  });
+});
+
+test('canonical delete paths remove rows stored under legacy raw keys', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const row = { id: 'foo', v: 1 };
+  const modifications = [
+    { property: '/items', func: 'delbyid', value: 'foo' },
+    { property: '/items', func: 'delbyvalue', value: row },
+    { property: '/items/@getById:foo', func: 'del' },
+  ];
+
+  for (const modify of modifications) {
+    const result = buildClassifiedUserDocUpdate({
+      JSONPointer,
+      ModifyData,
+      userData: {
+        items: {
+          type: 'Collection',
+          order: ['foo'],
+          valueById: { foo: row },
+        },
+      },
+      modify,
+      FieldValue,
+      language: 'en_US',
+    });
+
+    assert.equal(result.category, 'atomic-transform', modify.func);
+    assert.deepEqual(result.update, {
+      'items.order': { __op: 'arrayRemove', values: ['foo'] },
+      'items.valueById.foo': { __op: 'delete' },
+    });
+  }
+});
+
+test('canonical Collection delbyid removes equivalent memberships when the row is absent locally', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      items: { type: 'Collection', order: [], valueById: {} },
+    },
+    modify: { property: '/items', func: 'delbyid', value: '1' },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'atomic-transform');
+  assert.deepEqual(result.update, {
+    'items.order': { __op: 'arrayRemove', values: ['1', 1] },
+    [`items.valueById.${encodeIdKey('1')}`]: { __op: 'delete' },
+  });
+});
+
+test('inc and dec of a missing canonical row field stay atomic', () => {
+  for (const [func, operand] of [
+    ['inc', 2],
+    ['dec', -2],
+  ]) {
+    const { result, rowKey } = buildCanonicalRowUpdate({
+      row: { untouched: true },
+      modify: {
+        property: '/items/@getById:1/score',
+        func,
+        value: 2,
+      },
+    });
+
+    assert.equal(result.category, 'atomic-transform', func);
+    assert.deepEqual(result.update, {
+      [`items.valueById.${rowKey}.score`]: {
+        __op: 'increment',
+        n: operand,
+      },
+    });
+  }
+});
+
+test('plain-array delbyid keeps exact-row arrayRemove', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { rows: [{ id: '1', v: 1 }] },
+    modify: { property: '/rows', func: 'delbyid', value: '1' },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'atomic-transform');
+  assert.deepEqual(result.update, {
+    rows: { __op: 'arrayRemove', values: [{ id: '1', v: 1 }] },
+  });
+});
+
+test('parsePointerObjects returns [] for an unparseable property', () => {
+  const { parsePointerObjects } = modifyDataAdapter;
+  assert.deepEqual(
+    parsePointerObjects({ JSONPointer, property: 42 }),
+    [],
+  );
+});
+
+test('buildClassifiedUserDocUpdate classifies @getById array set as a local rewrite', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { rows: [{ id: '1', v: 1 }, { id: '2', v: 2 }] },
+    modify: {
+      property: '/rows/@getById:2/v',
+      func: 'set',
+      value: 9,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'local-rewrite');
+  assert.deepEqual(result.update, {
+    rows: [{ id: '1', v: 1 }, { id: '2', v: 9 }],
+  });
+});
+
+test('buildClassifiedUserDocUpdate classifies @getByIndex array set as a local rewrite', () => {
+  const { buildClassifiedUserDocUpdate } = modifyDataAdapter;
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: { rows: [{ v: 1 }, { v: 2 }] },
+    modify: {
+      property: '/rows/@getByIndex:1/v',
+      func: 'set',
+      value: 9,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'local-rewrite');
+  assert.deepEqual(result.update, {
+    rows: [{ v: 1 }, { v: 9 }],
+  });
+});
+
+test('canonical Collection targeted set beneath a dotted literal key uses FIELD_PATH_UPDATES', () => {
+  const { buildClassifiedUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      'a.b': {
+        type: 'Collection',
+        order: ['1'],
+        valueById: { [encodeIdKey('1')]: { id: '1', v: 1 } },
+      },
+    },
+    modify: {
+      property: [
+        { func: 'getKey', value: 'a.b' },
+        { func: 'getById', value: '1' },
+        { func: 'getKey', value: 'v' },
+      ],
+      func: 'set',
+      value: 9,
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'targeted-write');
+  assert.deepEqual(Object.keys(result.update), []);
+  assert.deepEqual(result.update[FIELD_PATH_UPDATES], [
+    {
+      segments: ['a.b', 'valueById', encodeIdKey('1'), 'v'],
+      value: 9,
+    },
+  ]);
+});
+
+test('canonical Collection add beneath a dotted literal key uses FIELD_PATH_UPDATES', () => {
+  const { buildClassifiedUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      'a.b': {
+        type: 'Collection',
+        order: ['1'],
+        valueById: { [encodeIdKey('1')]: { id: '1', v: 1 } },
+      },
+    },
+    modify: {
+      property: [{ func: 'getKey', value: 'a.b' }],
+      func: 'add',
+      value: { id: '2', v: 2 },
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'atomic-transform');
+  assert.deepEqual(Object.keys(result.update), []);
+  assert.deepEqual(result.update[FIELD_PATH_UPDATES], [
+    {
+      segments: ['a.b', 'order'],
+      value: { __op: 'arrayUnion', values: ['2'] },
+    },
+    {
+      segments: ['a.b', 'valueById', encodeIdKey('2')],
+      value: { id: '2', v: 2 },
+    },
+  ]);
+});
+
+test('canonical Collection delete beneath a dotted literal key uses FIELD_PATH_UPDATES', () => {
+  const { buildClassifiedUserDocUpdate, FIELD_PATH_UPDATES } = modifyDataAdapter;
+  const result = buildClassifiedUserDocUpdate({
+    JSONPointer,
+    ModifyData,
+    userData: {
+      'a.b': {
+        type: 'Collection',
+        order: ['1', '2'],
+        valueById: {
+          [encodeIdKey('1')]: { id: '1', v: 1 },
+          [encodeIdKey('2')]: { id: '2', v: 2 },
+        },
+      },
+    },
+    modify: {
+      property: [{ func: 'getKey', value: 'a.b' }],
+      func: 'delbyid',
+      value: '2',
+    },
+    FieldValue,
+    language: 'en_US',
+  });
+
+  assert.equal(result.category, 'atomic-transform');
+  assert.deepEqual(Object.keys(result.update), []);
+  assert.deepEqual(result.update[FIELD_PATH_UPDATES], [
+    {
+      segments: ['a.b', 'order'],
+      value: { __op: 'arrayRemove', values: ['2'] },
+    },
+    {
+      segments: ['a.b', 'valueById', encodeIdKey('2')],
+      value: { __op: 'delete' },
+    },
+  ]);
 });

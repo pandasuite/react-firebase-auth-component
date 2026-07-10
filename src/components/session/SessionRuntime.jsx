@@ -1,46 +1,8 @@
 import { useContext, useEffect } from 'react';
 import PandaBridge from 'pandasuite-bridge';
-import { deleteDB, openDB } from 'idb';
-import { find } from 'lodash';
 
 import FirebaseBridgeContext from '../../FirebaseBridgeContext';
 import { toQueryableShape } from '../../hooks/useFirebaseWithBridge/collectionStorageAdapter.mjs';
-
-async function fixIndexDbBug() {
-  if (
-    typeof window === 'undefined' ||
-    !window.indexedDB ||
-    typeof window.indexedDB.databases !== 'function'
-  ) {
-    return;
-  }
-
-  const databases = await window.indexedDB.databases();
-  const firestoreDb = find(databases, (db) =>
-    db?.name?.startsWith('firestore/'),
-  );
-
-  if (!firestoreDb) {
-    return;
-  }
-
-  const timeOut = setTimeout(async () => {
-    try {
-      await deleteDB(firestoreDb.name);
-    } catch (error) {
-      console.error('IndexedDB cleanup failed', error);
-    }
-  }, 200);
-
-  try {
-    const db = await openDB(firestoreDb.name);
-    await db.getAll('owner');
-    clearTimeout(timeOut);
-    db.close();
-  } catch (error) {
-    console.error('IndexedDB Safari workaround failed', error);
-  }
-}
 
 function SessionRuntime() {
   const firebaseWithBridge = useContext(FirebaseBridgeContext);
@@ -76,8 +38,6 @@ function SessionRuntime() {
         PandaBridge.send('onSignedOut');
         return;
       }
-
-      fixIndexDbBug();
 
       unsubscribeUserDoc = firestore
         .collection('users')
