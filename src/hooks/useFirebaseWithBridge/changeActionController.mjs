@@ -7,6 +7,26 @@ import {
   toQueuedChangeModify,
 } from './changeActionQueue.mjs';
 
+export const subscribeToChangeAuth = ({ auth, setUser, syncAuth }) => {
+  if (
+    auth === false ||
+    auth === null ||
+    typeof auth?.onIdTokenChanged !== 'function'
+  ) {
+    setUser(null);
+    syncAuth(auth);
+    return undefined;
+  }
+
+  const handleUser = (user) => {
+    setUser(user);
+    syncAuth({ currentUser: user });
+  };
+
+  handleUser(auth.currentUser ?? null);
+  return auth.onIdTokenChanged(handleUser);
+};
+
 export const createChangeActionController = ({
   applyChange,
   sendChangeError,
@@ -17,6 +37,7 @@ export const createChangeActionController = ({
 }) => {
   let pendingChanges = [];
   let timeoutId = null;
+  let synchronizedUid = null;
 
   const clearPendingTimeout = () => {
     if (timeoutId !== null) {
@@ -44,8 +65,10 @@ export const createChangeActionController = ({
     pendingChanges = [];
     clearPendingTimeout();
 
-    queued.forEach((modify) => {
-      applyChange({ user, modify });
+    queued.forEach(({ uid, modify }) => {
+      if (uid === null || uid === user.uid) {
+        applyChange({ user, modify });
+      }
     });
   };
 
@@ -64,10 +87,10 @@ export const createChangeActionController = ({
     }, timeoutMs);
   };
 
-  const enqueuePendingChange = (modify) => {
+  const enqueuePendingChange = (modify, uid = null) => {
     const { queue, dropped } = queueChangeModify({
       queue: pendingChanges,
-      modify,
+      modify: { uid, modify },
       maxSize: maxQueueSize,
     });
 
@@ -91,6 +114,10 @@ export const createChangeActionController = ({
     const authState = describeChangeAuthState(auth);
 
     if (authState === 'ready') {
+      if (auth.currentUser.uid !== synchronizedUid) {
+        enqueuePendingChange(modify, auth.currentUser.uid);
+        return;
+      }
       flushPendingChanges(auth.currentUser);
       applyChange({ user: auth.currentUser, modify });
       return;
@@ -117,6 +144,7 @@ export const createChangeActionController = ({
 
   const syncAuth = (auth) => {
     const authState = describeChangeAuthState(auth);
+    synchronizedUid = authState === 'ready' ? auth.currentUser.uid : null;
     const pendingPolicy = resolvePendingChangePolicy({
       authState,
       hasPendingChanges: pendingChanges.length > 0,

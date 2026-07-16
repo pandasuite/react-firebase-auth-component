@@ -287,9 +287,9 @@
           }
         }
       },
-      "description": "Fires when a user data modification fails.",
+      "description": "Fires when a user data modification submitted by the current page fails. After a reload, Firestore-restored writes reconcile data without emitting this event.",
       "locale_description": {
-        "fr_FR": "Se déclenche quand une modification des données utilisateur échoue."
+        "fr_FR": "Se déclenche lorsqu’une modification des données utilisateur envoyée par la page courante échoue. Après un rechargement, les écritures restaurées par Firestore réconcilient les données sans déclencher cet événement."
       }
     }
   ],

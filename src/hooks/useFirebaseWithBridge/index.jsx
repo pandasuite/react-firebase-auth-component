@@ -7,7 +7,7 @@ import app from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 // import { setLogLevel } from 'firebase/app';
-import { useMemo, useEffect, useCallback } from 'react';
+import { useMemo, useEffect, useCallback, useRef } from 'react';
 
 import { JSONPointer, ModifyData } from '@beingenious/jsonpointer';
 import { initializeFirebase } from './firebaseConfig';
@@ -18,69 +18,26 @@ import {
 } from './emailLinkSignInActions.mjs';
 import { normalizeCollectionsForStorage } from './collectionStorageAdapter.mjs';
 import {
-  buildUserDocUpdate,
-  REPLACE_DOCUMENT_UPDATE,
-} from './modifyDataAdapter.mjs';
-import { createChangeActionController } from './changeActionController.mjs';
+  createChangeActionController,
+  subscribeToChangeAuth,
+} from './changeActionController.mjs';
+import { createChangeRuntime } from './createChangeRuntime.mjs';
 
 let firestore = null;
 let auth = null;
 
 // setLogLevel('debug');
 
-const changeData = ({ user, modify }) => {
-  const userDocRef = firestore.collection('users').doc(user.uid);
-
-  firestore
-    .runTransaction((transaction) =>
-      transaction.get(userDocRef).then((userDoc) => {
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-
-          const update = buildUserDocUpdate({
-            JSONPointer,
-            ModifyData,
-            userData,
-            modify,
-            FieldValue: app.firestore.FieldValue,
-            language: navigator.language.replace('-', '_'),
-          });
-          if (update) {
-            if (
-              Object.prototype.hasOwnProperty.call(
-                update,
-                REPLACE_DOCUMENT_UPDATE,
-              )
-            ) {
-              transaction.set(userDocRef, update[REPLACE_DOCUMENT_UPDATE]);
-            } else {
-              transaction.update(userDocRef, update);
-            }
-          }
-        }
-      }),
-    )
-    .catch((error) => {
-      // eslint-disable-next-line no-console
-      console.log(error);
-      PandaBridge.send('onChangeError', [
-        {
-          code: (error && error.code) || 'unknown',
-          message: (error && error.message) || String(error),
-        },
-      ]);
-    });
-};
-
 function useFirebaseWithBridge() {
   const sendChangeError = useCallback((code, message) => {
     PandaBridge.send('onChangeError', [{ code, message }]);
   }, []);
+  const changeRuntimeRef = useRef(null);
   const changeActionController = useMemo(
     () =>
       createChangeActionController({
         applyChange: ({ user, modify }) => {
-          changeData({ user, modify });
+          changeRuntimeRef.current?.enqueue({ uid: user.uid, modify });
         },
         sendChangeError,
       }),
@@ -216,24 +173,42 @@ function useFirebaseWithBridge() {
     }
   }, [mergedProperties]);
 
-  useEffect(() => {
-    if (
-      auth === false ||
-      auth === null ||
-      typeof auth?.onAuthStateChanged !== 'function'
-    ) {
-      changeActionController.syncAuth(auth);
-      return undefined;
+  const changeRuntime = useMemo(() => {
+    if (!firestore) {
+      return null;
     }
-
-    changeActionController.syncAuth(auth);
-
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      changeActionController.syncAuth({ currentUser: user });
+    return createChangeRuntime({
+      firestore,
+      FieldValue: app.firestore.FieldValue,
+      FieldPath: app.firestore.FieldPath,
+      JSONPointer,
+      ModifyData,
+      sendChangeError,
+      language: navigator.language.replace('-', '_'),
     });
+  }, [firestore, sendChangeError]);
 
-    return () => unsubscribe();
-  }, [auth, changeActionController]);
+  useEffect(() => {
+    changeRuntimeRef.current = changeRuntime;
+    return () => {
+      if (changeRuntime) {
+        changeRuntime.dispose();
+      }
+      if (changeRuntimeRef.current === changeRuntime) {
+        changeRuntimeRef.current = null;
+      }
+    };
+  }, [changeRuntime]);
+
+  useEffect(
+    () =>
+      subscribeToChangeAuth({
+        auth,
+        setUser: (user) => changeRuntimeRef.current?.setUser(user),
+        syncAuth: changeActionController.syncAuth,
+      }),
+    [auth, changeActionController, changeRuntime],
+  );
 
   useEffect(
     () => () => {

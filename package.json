@@ -3,6 +3,11 @@
   "version": "5.2.4",
   "homepage": "./",
   "private": true,
+  "resolutions": {
+    "@google-cloud/cloud-sql-connector": "1.8.2",
+    "re2": "1.21.4",
+    "universal-analytics": "0.5.3"
+  },
   "dependencies": {
     "@beingenious/jsoneditor": "^0.14.8",
     "@beingenious/jsonpointer": "^3.6.2",
@@ -30,6 +35,7 @@
     "start:auth": "vite --open /auth.html",
     "start:session": "vite --open /session.html",
     "test": "node --test tests/*.test.mjs",
+    "test:emulator": "firebase emulators:exec --config tests/emulator/firebase.json --only firestore --project demo-panda-optimistic \"node --test --test-concurrency=1 tests/emulator/*.test.mjs\"",
     "build:auth": "cross-env VITE_APP_TARGET=auth vite build --outDir build-auth --emptyOutDir",
     "build:session": "cross-env VITE_APP_TARGET=session vite build --outDir build-session --emptyOutDir && mv build-session/session.html build-session/index.html",
     "package:auth": "cp src/json/auth/pandasuite.json build-auth/pandasuite.json && cd build-auth && zip -r -X ../pandasuite-auth-component.zip *",
@@ -70,6 +76,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-react-hooks": "^1.7.0",
+    "firebase-tools": "^13",
     "postcss": "^7",
     "prettier": "^3.2.5",
     "release-it": "^13.0.1",
