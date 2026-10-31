@@ -50,39 +50,84 @@ body,
   background-color: rgba(var(--c-red-50), var(--tw-bg-opacity));
 }
 
-/* jsoneditor 0.14.8 has no dark look: it stays light, as an island, until its
- * upgrade, with the popovers it portals into <body> (outside #root). Undo the
- * theme's rules that reach into it, with its own values. */
+/* jsoneditor 0.14.8 has no dark theme of its own (its colour picker and grid
+ * only follow the OS scheme): it stays light, as an island, until its upgrade,
+ * with the popovers it portals into <body> (outside #root). Undo the theme's
+ * rules that reach into it, with its own values, on its portal roots too. */
 .dark .session-json-island,
 .dark body > :not(#root) {
   color-scheme: light;
 }
 .dark .session-json-island .bg-white,
-.dark body > :not(#root) .bg-white {
+.dark body > :not(#root) .bg-white,
+.dark body > .bg-white:not(#root) {
   background-color: #fff;
 }
+.dark .session-json-island .hover\:bg-gray-50:hover,
+.dark body > :not(#root) .hover\:bg-gray-50:hover,
+.dark body > .hover\:bg-gray-50:hover:not(#root) {
+  background-color: #f9fafb;
+}
 .dark .session-json-island .border-white,
-.dark body > :not(#root) .border-white {
+.dark body > :not(#root) .border-white,
+.dark body > .border-white:not(#root) {
   border-color: #fff;
 }
 .dark .session-json-island .text-indigo-600,
-.dark body > :not(#root) .text-indigo-600 {
+.dark body > :not(#root) .text-indigo-600,
+.dark body > .text-indigo-600:not(#root) {
   color: #4f46e5;
 }
 .dark .session-json-island .text-red-600,
-.dark body > :not(#root) .text-red-600 {
+.dark body > :not(#root) .text-red-600,
+.dark body > .text-red-600:not(#root) {
   color: #dc2626;
 }
+
+/* Bare fields go back to the browser's white, except the colour picker's,
+ * which keep their own background: white or #363636 with the OS scheme, and
+ * transparent for its gradient controls. */
 .dark
   .session-json-island
-  input:not([class*='bg-']):not([type='checkbox']):not([type='radio']),
+  input:not([class*='bg-']):not([class*='rbgcp']):not([type='checkbox']):not(
+    [type='radio']
+  ),
 .dark .session-json-island select:not([class*='bg-']),
 .dark .session-json-island textarea:not([class*='bg-']),
 .dark
   body
   > :not(#root)
-  input:not([class*='bg-']):not([type='checkbox']):not([type='radio']),
+  input:not([class*='bg-']):not([class*='rbgcp']):not([type='checkbox']):not(
+    [type='radio']
+  ),
 .dark body > :not(#root) select:not([class*='bg-']),
-.dark body > :not(#root) textarea:not([class*='bg-']) {
+.dark body > :not(#root) textarea:not([class*='bg-']),
+.dark
+  .session-json-island
+  input[class*='rbgcpInput']:not([type='checkbox']):not([type='radio']),
+.dark
+  body
+  > :not(#root)
+  input[class*='rbgcpInput']:not([type='checkbox']):not([type='radio']) {
   background-color: #fff;
+}
+.dark
+  .session-json-island
+  input[class*='rbgcpControlInput']:not([type='checkbox']):not([type='radio']),
+.dark
+  body
+  > :not(#root)
+  input[class*='rbgcpControlInput']:not([type='checkbox']):not([type='radio']) {
+  background-color: transparent;
+}
+@media (prefers-color-scheme: dark) {
+  .dark
+    .session-json-island
+    input[class*='rbgcpInput']:not([type='checkbox']):not([type='radio']),
+  .dark
+    body
+    > :not(#root)
+    input[class*='rbgcpInput']:not([type='checkbox']):not([type='radio']) {
+    background-color: #363636;
+  }
 }
