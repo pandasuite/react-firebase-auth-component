@@ -7,3 +7,82 @@ body,
 #root {
   overflow: hidden;
 }
+
+/* In the dark Studio theme. jsoneditor's stylesheet, loaded after this one with
+ * the editor, redefines these utilities with fixed light colours: the Session
+ * editor's own UI (its tab bar and the .session-themed parts) takes them back
+ * from the theme's variables. */
+.dark .session-setup-container > .sticky .text-gray-400,
+.dark .session-themed.text-gray-400,
+.dark .session-themed .text-gray-400 {
+  --tw-text-opacity: 1;
+  color: rgba(var(--c-gray-400), var(--tw-text-opacity));
+}
+.dark .session-setup-container > .sticky .text-gray-500,
+.dark .session-themed.text-gray-500,
+.dark .session-themed .text-gray-500 {
+  --tw-text-opacity: 1;
+  color: rgba(var(--c-gray-500), var(--tw-text-opacity));
+}
+.dark .session-setup-container > .sticky .text-gray-700,
+.dark .session-themed.text-gray-700,
+.dark .session-themed .text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgba(var(--c-gray-700), var(--tw-text-opacity));
+}
+.dark .session-themed.text-gray-800,
+.dark .session-themed .text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgba(var(--c-gray-800), var(--tw-text-opacity));
+}
+.dark .session-themed.bg-gray-100,
+.dark .session-themed .bg-gray-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgba(var(--c-gray-100), var(--tw-bg-opacity));
+}
+.dark .session-themed .hover\:bg-gray-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgba(var(--c-gray-200), var(--tw-bg-opacity));
+}
+.dark .session-themed.bg-red-50,
+.dark .session-themed .bg-red-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgba(var(--c-red-50), var(--tw-bg-opacity));
+}
+
+/* jsoneditor 0.14.8 has no dark look: it stays light, as an island, until its
+ * upgrade, with the popovers it portals into <body> (outside #root). Undo the
+ * theme's rules that reach into it, with its own values. */
+.dark .session-json-island,
+.dark body > :not(#root) {
+  color-scheme: light;
+}
+.dark .session-json-island .bg-white,
+.dark body > :not(#root) .bg-white {
+  background-color: #fff;
+}
+.dark .session-json-island .border-white,
+.dark body > :not(#root) .border-white {
+  border-color: #fff;
+}
+.dark .session-json-island .text-indigo-600,
+.dark body > :not(#root) .text-indigo-600 {
+  color: #4f46e5;
+}
+.dark .session-json-island .text-red-600,
+.dark body > :not(#root) .text-red-600 {
+  color: #dc2626;
+}
+.dark
+  .session-json-island
+  input:not([class*='bg-']):not([type='checkbox']):not([type='radio']),
+.dark .session-json-island select:not([class*='bg-']),
+.dark .session-json-island textarea:not([class*='bg-']),
+.dark
+  body
+  > :not(#root)
+  input:not([class*='bg-']):not([type='checkbox']):not([type='radio']),
+.dark body > :not(#root) select:not([class*='bg-']),
+.dark body > :not(#root) textarea:not([class*='bg-']) {
+  background-color: #fff;
+}
