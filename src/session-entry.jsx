@@ -8,7 +8,7 @@ import { PandaBridgeRoot } from 'pandasuite-bridge-react';
 import './App.css';
 import SessionApp from './SessionApp';
 
-PandaBridge.followStudioTheme();
+PandaBridge.followStudioAppearance();
 
 createRoot(document.getElementById('root')).render(
   <PandaBridgeRoot>
