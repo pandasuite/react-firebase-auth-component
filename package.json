@@ -10,7 +10,7 @@
     "universal-analytics": "0.5.3"
   },
   "dependencies": {
-    "@beingenious/jsoneditor": "^0.17.6",
+    "@beingenious/jsoneditor": "^0.17.7",
     "@beingenious/jsonpointer": "^3.6.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
