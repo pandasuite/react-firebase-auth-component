@@ -10,7 +10,7 @@
     "universal-analytics": "0.5.3"
   },
   "dependencies": {
-    "@beingenious/jsoneditor": "^0.17.5",
+    "@beingenious/jsoneditor": "^0.17.6",
     "@beingenious/jsonpointer": "^3.6.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -19,7 +19,7 @@
     "formik": "^2.1.4",
     "idb": "^8.0.0",
     "lodash": "^4.17.21",
-    "pandasuite-bridge": "^5.0.4",
+    "pandasuite-bridge": "^5.2.0",
     "pandasuite-bridge-react": "^3.0.4",
     "prop-types": "^15.7.2",
     "react": "^18.2.0",
