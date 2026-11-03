@@ -4,12 +4,13 @@
   "homepage": "./",
   "private": true,
   "resolutions": {
+    "@beingenious/jsoneditor/@beingenious/jsonpointer": "3.6.2",
     "@google-cloud/cloud-sql-connector": "1.8.2",
     "re2": "1.21.4",
     "universal-analytics": "0.5.3"
   },
   "dependencies": {
-    "@beingenious/jsoneditor": "^0.14.8",
+    "@beingenious/jsoneditor": "^0.17.5",
     "@beingenious/jsonpointer": "^3.6.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",

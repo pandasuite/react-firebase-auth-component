@@ -25,9 +25,7 @@ import FirebaseBridgeContext from '../../FirebaseBridgeContext';
 import { toQueryableShape } from '../../hooks/useFirebaseWithBridge/collectionStorageAdapter.mjs';
 
 const editorConfig = {
-  title: null,
   viewSwitchControl: true,
-  buttonSave: false,
   readOnly: false,
   gridView: {
     sideBar: false,
@@ -43,8 +41,6 @@ const editorConfig = {
   rawView: {
     importJson: false,
     exportJson: false,
-    formatJson: false,
-    compressJson: false,
   },
 };
 
