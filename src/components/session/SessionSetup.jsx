@@ -189,7 +189,7 @@ function SessionSetup() {
   const renderSessionTab = () => {
     if (auth === false) {
       return (
-        <Alert type="danger" className="session-themed mt-4">
+        <Alert type="danger" className="mt-4">
           {intl.formatMessage({ id: 'session.editor.alert.invalidConfig' })}
         </Alert>
       );
@@ -197,14 +197,14 @@ function SessionSetup() {
 
     if (auth === null) {
       return (
-        <Alert type="info" className="session-themed mt-4">
+        <Alert type="info" className="mt-4">
           {intl.formatMessage({ id: 'session.editor.alert.initializing' })}
         </Alert>
       );
     }
 
     return (
-      <div className="session-themed space-y-4 text-gray-800">
+      <div className="space-y-4 text-gray-800">
         <p className="mt-4 text-sm text-gray-500">
           {intl.formatMessage({ id: 'session.editor.helper.login' })}
         </p>
@@ -296,10 +296,10 @@ function SessionSetup() {
 
   const renderSchemaTab = () => (
     <div className="flex h-full flex-col gap-4 overflow-hidden pt-4 text-gray-800">
-      <p className="session-themed text-sm text-gray-500">
+      <p className="text-sm text-gray-500">
         {intl.formatMessage({ id: 'session.editor.helper.schema' })}
       </p>
-      <div className="session-json-island flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <JSONEditor
           data={schema}
           misc={jsonEditorMisc}
