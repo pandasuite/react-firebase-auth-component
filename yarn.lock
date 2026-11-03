@@ -213,13 +213,13 @@
     "@babel/helper-string-parser" "^7.25.9"
     "@babel/helper-validator-identifier" "^7.25.9"
 
-"@beingenious/jsoneditor@^0.14.8":
-  version "0.14.8"
-  resolved "https://npm.pkg.github.com/download/@beingenious/jsoneditor/0.14.8/330e494db98f03c068691f173091c3ca528300b2#330e494db98f03c068691f173091c3ca528300b2"
-  integrity sha512-wkrw//nb+8QtlL7Z/iT2CXh1D7AuVbh/2dO59X1tz4ys9qiOGO3o9qB357Ht+sMHflb2FBaJH3P6y08VvqBMUQ==
+"@beingenious/jsoneditor@^0.17.5":
+  version "0.17.5"
+  resolved "https://npm.pkg.github.com/download/@beingenious/jsoneditor/0.17.5/eca114508d21f8a0f9c40b7f8438da5fd6c77487#eca114508d21f8a0f9c40b7f8438da5fd6c77487"
+  integrity sha512-PnnmF6lM1ug5spCOqfV6PNHHHaI3QzLr3AizTM0fp6ZLk3N32YxQ52AF2nrwZRMZMu6MSPJ5xKfdFDVkYb0Ydg==
   dependencies:
     "@ag-grid-community/locale" "^34.0.0"
-    "@beingenious/jsonpointer" "^2.1.4"
+    "@beingenious/jsonpointer" "^3.6.4"
     "@codemirror/lang-json" "^6.0.1"
     "@headlessui/react" "^2.0.4"
     "@heroicons/react" "^2.1.3"
@@ -245,17 +245,7 @@
     tailwindcss-animate "^1.0.7"
     use-eye-dropper "^1.6.1"
 
-"@beingenious/jsonpointer@^2.1.4":
-  version "2.1.4"
-  resolved "https://npm.pkg.github.com/download/@beingenious/jsonpointer/2.1.4/85a3de47438d8cc0309883afec9027fe0bd55598#85a3de47438d8cc0309883afec9027fe0bd55598"
-  integrity sha512-GYrjnHtQwxuXkyMzGQ6IVAy/1m8QdZqWWDPq34t7NE5+giY+bIj6gQodhCemlo508giEaSMRUp/JeBxEbfKF4A==
-  dependencies:
-    date-fns "^2.30.0"
-    date-fns-tz "^2.0.0"
-    lodash "^4.17.21"
-    marked "^4.0.0"
-
-"@beingenious/jsonpointer@^3.6.2":
+"@beingenious/jsonpointer@3.6.2", "@beingenious/jsonpointer@^3.6.2", "@beingenious/jsonpointer@^3.6.4":
   version "3.6.2"
   resolved "https://npm.pkg.github.com/download/@beingenious/jsonpointer/3.6.2/cb05cb0f473c74e039497659b76879e4b3cacbc5#cb05cb0f473c74e039497659b76879e4b3cacbc5"
   integrity sha512-C3cTbDp698++GGbuuLhZbFVpjB3vNJCuUkpXTwiRbx15jYeVJBol79IFFSYL79TKcFQ2Zyoxti364IVkuygDag==
@@ -7302,11 +7292,6 @@ marked@^13.0.2:
   version "13.0.3"
   resolved "https://registry.yarnpkg.com/marked/-/marked-13.0.3.tgz#5c5b4a5d0198060c7c9bc6ef9420a7fed30f822d"
   integrity sha512-rqRix3/TWzE9rIoFGIn8JmsVfhiuC8VIQ8IdX5TfzmeBucdY05/0UlzKaw0eVtpcN/OdVFpBk7CjKGo9iHJ/zA==
-
-marked@^4.0.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-4.3.0.tgz#796362821b019f734054582038b116481b456cf3"
-  integrity sha512-PRsaiG84bK+AMvxziE/lCFss8juXjNaWzVbN5tXAm4XjeaS9NAHhop+PjQxz2A9h8Q4M/xGmzP8vqNwy6JeK0A==
 
 math-intrinsics@^1.1.0:
   version "1.1.0"
