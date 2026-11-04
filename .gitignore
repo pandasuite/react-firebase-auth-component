@@ -25,6 +25,8 @@ yarn-debug.log*
 yarn-error.log*
 /.vscode
 /pandasuite-component.zip
+/react-firebase-auth-component-v*.zip
+/react-firebase-session-component-v*.zip
 /pandasuite-session-component.zip
 /pandasuite-auth-component.zip
 /public/pandasuite.json
